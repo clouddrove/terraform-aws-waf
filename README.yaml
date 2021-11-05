@@ -1,0 +1,102 @@
+---
+#
+# This is the canonical configuration for the `README.md`
+# Run `make readme` to rebuild the `README.md`
+#
+
+# Name of this project
+name: Terraform AWS WAF
+
+# License of this project
+license: "MIT"
+
+# Canonical GitHub repo
+github_repo: clouddrove/terraform--aws-waf
+
+# Badges to display
+badges:
+  - name: "Terraform"
+    image: "https://img.shields.io/badge/Terraform-v0.15-green"
+    url: "https://www.terraform.io"
+  - name: "Licence"
+    image: "https://img.shields.io/badge/License-MIT-blue.svg"
+    url: "LICENSE.md"
+
+#  description of this project
+description: |-
+  Terraform module to create waf on AWS.
+
+# extra content
+# please not remove these two If you need add more
+include:
+  - "terraform.md"
+
+# How to use this project
+# yamllint disable rule:line-length
+usage: |-
+  ### Simple example
+  Here is an example of how you can use this module in your inventory structure:
+  ```hcl
+  module "waf" {
+  source      = "clouddrove/waf/aws"
+  name                 = "waf"
+  environment          = "test"
+  allow_default_action = true
+  waf_enabled          = true
+  waf_scop             = "REGIONAL"
+
+  web_acl_association = false
+
+  visibility_config = {
+    cloudwatch_metrics_enabled = true
+    sampled_requests_enabled   = true
+  }
+
+  rules = [
+    {
+      name     = "AWSManagedRulesAmazonIpReputationList"
+      priority = "0"
+
+      override_action = "none"
+
+      visibility_config = {
+        cloudwatch_metrics_enabled = true
+        metric_name                = "AWS-AWSManagedRulesAmazonIpReputationList"
+        sampled_requests_enabled   = true
+      }
+
+      managed_rule_group_statement = {
+        name        = "AWSManagedRulesAmazonIpReputationList"
+        vendor_name = "AWS"
+      }
+    },
+
+    {
+      name     = "rate-limit"
+      priority = "1"
+      action   = "block"
+
+      visibility_config = {
+        cloudwatch_metrics_enabled = true
+        metric_name                = "rate-limit"
+        sampled_requests_enabled   = true
+      }
+
+      rate_based_statement = {
+        limit              = 2000
+        aggregate_key_type = "IP"
+      }
+    }
+  ]
+
+  #logs
+
+  create_logging_configuration = false
+  redacted_fields = [
+    {
+      single_header = {
+        name = "user-agent"
+      }
+    }
+  ]
+  ```
