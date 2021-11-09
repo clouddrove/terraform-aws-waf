@@ -4,11 +4,11 @@
 
 
 <h1 align="center">
-    Terraform AWS IAM Role
+    Terraform AWS WAF
 </h1>
 
 <p align="center" style="font-size: 1.2rem;"> 
-    Terraform module to create Iam role resource on AWS.
+    Terraform module to create waf on AWS.
      </p>
 
 <p align="center">
@@ -24,13 +24,13 @@
 </p>
 <p align="center">
 
-<a href='https://facebook.com/sharer/sharer.php?u=https://github.com/clouddrove/terraform-aws-iam-role'>
+<a href='https://facebook.com/sharer/sharer.php?u=https://github.com/clouddrove/terraform--aws-waf'>
   <img title="Share on Facebook" src="https://user-images.githubusercontent.com/50652676/62817743-4f64cb80-bb59-11e9-90c7-b057252ded50.png" />
 </a>
-<a href='https://www.linkedin.com/shareArticle?mini=true&title=Terraform+AWS+IAM+Role&url=https://github.com/clouddrove/terraform-aws-iam-role'>
+<a href='https://www.linkedin.com/shareArticle?mini=true&title=Terraform+AWS+WAF&url=https://github.com/clouddrove/terraform--aws-waf'>
   <img title="Share on LinkedIn" src="https://user-images.githubusercontent.com/50652676/62817742-4e339e80-bb59-11e9-87b9-a1f68cae1049.png" />
 </a>
-<a href='https://twitter.com/intent/tweet/?text=Terraform+AWS+IAM+Role&url=https://github.com/clouddrove/terraform-aws-iam-role'>
+<a href='https://twitter.com/intent/tweet/?text=Terraform+AWS+WAF&url=https://github.com/clouddrove/terraform--aws-waf'>
   <img title="Share on Twitter" src="https://user-images.githubusercontent.com/50652676/62817740-4c69db00-bb59-11e9-8a79-3580fbbf6d5c.png" />
 </a>
 
@@ -51,7 +51,7 @@ We have [*fifty plus terraform modules*][terraform_modules]. A few of them are c
 
 This module has a few dependencies: 
 
-- [Terraform 0.13](https://learn.hashicorp.com/terraform/getting-started/install.html)
+- [Terraform 0.15](https://learn.hashicorp.com/terraform/getting-started/install.html)
 - [Go](https://golang.org/doc/install)
 - [github.com/stretchr/testify/assert](https://github.com/stretchr/testify)
 - [github.com/gruntwork-io/terratest/modules/terraform](https://github.com/gruntwork-io/terratest)
@@ -65,49 +65,74 @@ This module has a few dependencies:
 ## Examples
 
 
-**IMPORTANT:** Since the `master` branch used in `source` varies based on new modifications, we suggest that you use the release versions [here](https://github.com/clouddrove/terraform-aws-iam-role/releases).
+**IMPORTANT:** Since the `master` branch used in `source` varies based on new modifications, we suggest that you use the release versions [here](https://github.com/clouddrove/terraform--aws-waf/releases).
 
 
 ### Simple example
 Here is an example of how you can use this module in your inventory structure:
 ```hcl
-      module "iam-role" {
-      source      = "clouddrove/iam-role/aws"
-      version     = "0.15.0"
+module "waf" {
+source      = "clouddrove/waf/aws"
+name                 = "waf"
+environment          = "test"
+allow_default_action = true
+waf_enabled          = true
+waf_scop             = "REGIONAL"
 
-      name               = "iam-role"
-      application        = "clouddrove"
-      environment        = "test"
-      label_order        = ["environment", "name"]
-      assume_role_policy = data.aws_iam_policy_document.default.json
+web_acl_association = false
 
-      policy_enabled = true
-      policy         = data.aws_iam_policy_document.iam-policy.json
+visibility_config = {
+  cloudwatch_metrics_enabled = true
+  sampled_requests_enabled   = true
+}
+
+rules = [
+  {
+    name     = "AWSManagedRulesAmazonIpReputationList"
+    priority = "0"
+
+    override_action = "none"
+
+    visibility_config = {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "AWS-AWSManagedRulesAmazonIpReputationList"
+      sampled_requests_enabled   = true
     }
 
-      data "aws_iam_policy_document" "default" {
-      statement {
-      effect  = "Allow"
-      actions = ["sts:AssumeRole"]
-      principals {
-      type        = "Service"
-      identifiers = ["ec2.amazonaws.com"]
-      }
-      }
+    managed_rule_group_statement = {
+      name        = "AWSManagedRulesAmazonIpReputationList"
+      vendor_name = "AWS"
+    }
+  },
+
+  {
+    name     = "rate-limit"
+    priority = "1"
+    action   = "block"
+
+    visibility_config = {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "rate-limit"
+      sampled_requests_enabled   = true
     }
 
-      data "aws_iam_policy_document" "iam-policy" {
-      statement {
-      actions = [
-      "ssm:UpdateInstanceInformation",
-      "ssmmessages:CreateControlChannel",
-      "ssmmessages:CreateDataChannel",
-      "ssmmessages:OpenControlChannel",
-      "ssmmessages:OpenDataChannel"    ]
-      effect    = "Allow"
-      resources = ["*"]
-      }
+    rate_based_statement = {
+      limit              = 2000
+      aggregate_key_type = "IP"
     }
+  }
+]
+
+#logs
+
+create_logging_configuration = false
+redacted_fields = [
+  {
+    single_header = {
+      name = "user-agent"
+    }
+  }
+]
 ```
 
 
@@ -119,31 +144,36 @@ Here is an example of how you can use this module in your inventory structure:
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| assume\_role\_policy | Whether to create Iam role. | `any` | n/a | yes |
+| allow\_default\_action | Set to `true` for WAF to allow requests by default. Set to `false` for WAF to block requests by default. | `bool` | `true` | no |
 | attributes | Additional attributes (e.g. `1`). | `list(any)` | `[]` | no |
-| delimiter | Delimiter to be used between `organization`, `environment`, `name` and `attributes`. | `string` | `"-"` | no |
-| description | The description of the role. | `string` | `""` | no |
-| enabled | Whether to create Iam role. | `bool` | `true` | no |
+| block\_sensitive\_paths | n/a | `bool` | `null` | no |
+| create\_logging\_configuration | Whether to create logging configuration in order start logging from a WAFv2 Web ACL to Amazon Kinesis Data Firehose. | `bool` | `true` | no |
 | environment | Environment (e.g. `prod`, `dev`, `staging`). | `string` | `""` | no |
-| force\_detach\_policies | The policy that grants an entity permission to assume the role. | `bool` | `false` | no |
+| firehose\_buffer\_interval | Buffer incoming data for the specified period of time, in seconds, before delivering it to the destination. Valid value is between 60-900. Smaller value makes the logs delivered faster. Bigger value increase the chance to make the file size bigger, which are more efficient to query. | `number` | `900` | no |
+| firehose\_buffer\_size | Buffer incoming data to the specified size, in MBs, before delivering it to the destination. Valid value is between 64-128. Recommended is 128, specifying a smaller buffer size can result in the delivery of very small S3 objects, which are less efficient to query. | `number` | `128` | no |
+| ip\_addresses | (Required) Contains an array of strings that specify one or more IP addresses or blocks of IP addresses in Classless Inter-Domain Routing (CIDR) notation. AWS WAF supports all address ranges for IP versions IPv4 and IPv6. | `list(string)` | `null` | no |
 | label\_order | Label order, e.g. `name`,`application`. | `list(any)` | `[]` | no |
-| managedby | ManagedBy, eg 'CloudDrove' | `string` | `"hello@clouddrove.com"` | no |
-| max\_session\_duration | The maximum session duration (in seconds) that you want to set for the specified role. If you do not specify a value for this setting, the default maximum of one hour is applied. This setting can have a value from 1 hour to 12 hours. | `number` | `3600` | no |
+| logging\_filter | A configuration block that specifies which web requests are kept in the logs and which are dropped. You can filter on the rule action and on the web request labels that were applied by matching rules during web ACL evaluation. | `any` | `{}` | no |
+| managedby | ManagedBy, eg 'CloudDrove' | `string` | `"CloudDrove"` | no |
 | name | Name  (e.g. `app` or `cluster`). | `string` | `""` | no |
-| path | The path to the role. | `string` | `"/"` | no |
-| permissions\_boundary | The ARN of the policy that is used to set the permissions boundary for the role. | `string` | `""` | no |
-| policy | The policy document. | `any` | `null` | no |
-| policy\_arn | The ARN of the policy you want to apply. | `string` | `""` | no |
-| policy\_enabled | Whether to Attach Iam policy with role. | `bool` | `false` | no |
-| repository | https://github.com/clouddrove/terraform-aws-iam-role | `string` | `""` | no |
+| redacted\_fields | The parts of the request that you want to keep out of the logs. Up to 100 `redacted_fields` blocks are supported. | `any` | `[]` | no |
+| repository | Terraform current module repo | `string` | `"https://github.com/clouddrove/terraform-aws-waf"` | no |
+| resource\_arn | ARN of the ALB or cloudfront to be associated with the WAFv2 ACL. | `string` | `""` | no |
+| resource\_arn\_list | ARN  List of the ALB or cloudfront to be associated with the WAFv2 ACL. | `list(string)` | `[]` | no |
+| rules | List of WAF rules. | `any` | `[]` | no |
 | tags | Additional tags (e.g. map(`BusinessUnit`,`XYZ`). | `map(any)` | `{}` | no |
+| visibility\_config | Visibility config for WAFv2 web acl. https://www.terraform.io/docs/providers/aws/r/wafv2_web_acl.html#visibility-configuration | `map(string)` | `{}` | no |
+| waf\_enabled | Flag to control the waf creation for load balancer. | `bool` | `false` | no |
+| waf\_scop | n/a | `string` | `"REGIONAL"` | no |
+| web\_acl\_association | If we associated with any resources to WAF | `bool` | `true` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
 | arn | The Amazon Resource Name (ARN) specifying the role. |
-| name | Name of specifying the role. |
+| id | Name of specifying the role. |
+| ip\_set\_arn | The ARN of Ip\_set |
 | tags | A mapping of tags to assign to the resource. |
 
 
@@ -160,9 +190,9 @@ You need to run the following command in the testing folder:
 
 
 ## Feedback 
-If you come accross a bug or have any feedback, please log it in our [issue tracker](https://github.com/clouddrove/terraform-aws-iam-role/issues), or feel free to drop us an email at [hello@clouddrove.com](mailto:hello@clouddrove.com).
+If you come accross a bug or have any feedback, please log it in our [issue tracker](https://github.com/clouddrove/terraform--aws-waf/issues), or feel free to drop us an email at [hello@clouddrove.com](mailto:hello@clouddrove.com).
 
-If you have found it worth your time, go ahead and give us a ★ on [our GitHub](https://github.com/clouddrove/terraform-aws-iam-role)!
+If you have found it worth your time, go ahead and give us a ★ on [our GitHub](https://github.com/clouddrove/terraform--aws-waf)!
 
 ## About us
 
