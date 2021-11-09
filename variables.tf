@@ -12,10 +12,10 @@ variable "environment" {
   description = "Environment (e.g. `prod`, `dev`, `staging`)."
 }
 
-variable "repository" {
+variable "application" {
   type        = string
-  default     = "https://github.com/clouddrove/terraform-aws-waf"
-  description = "Terraform current module repo"
+  default     = ""
+  description = "Application (e.g. `cd` or `clouddrove`)."
 }
 
 

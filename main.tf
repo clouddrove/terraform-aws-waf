@@ -4,13 +4,13 @@
 #              convention.
 module "labels" {
   source  = "clouddrove/labels/aws"
-  version = "0.15.0"
+  version = "0.12.0"
 
   name        = var.name
+  application = var.application
   environment = var.environment
   managedby   = var.managedby
   label_order = var.label_order
-  repository  = var.repository
 }
 
 #Module      : WAF
