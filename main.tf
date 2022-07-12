@@ -1013,29 +1013,39 @@ data "aws_region" "this" {}
 #
 ##logs_alb
 #
-# S3 Bucket to store WebACL Traffic Logs. This resource is needed by Amazon Kinesis Firehose as data delivery output target.
-resource "aws_s3_bucket" "webacl_traffic_information" {
+#resource "aws_s3_bucket" "webacl_traffic_information" {
   count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
   bucket = format("%s-waf-logs", module.labels.id)
-  acl    = "private"
+  tags = module.labels.tags
+}
 
-  server_side_encryption_configuration {
-    rule {
+resource "aws_s3_bucket_acl" "webacl_traffic_information" {
+  count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
+
+  bucket = join("", aws_s3_bucket.webacl_traffic_information.*.id)
+  acl    = "private"
+}
+
+  resource "aws_s3_bucket_versioning" "webacl_traffic_information" {
+  count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
+
+  bucket = join("", aws_s3_bucket.webacl_traffic_information.*.id)
+  versioning_configuration {
+    status = "Enabled"
+  }
+  }
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "webacl_traffic_information" {
+  count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
+
+  bucket = join("", aws_s3_bucket.webacl_traffic_information.*.id)
+ rule {
       apply_server_side_encryption_by_default {
         sse_algorithm = "AES256"
       }
     }
-  }
-
-  versioning {
-    enabled = "true"
-  }
-
-  tags = module.labels.tags
 }
-
-
 
 # AWS Glue Catalog Database. This resource is needed by Amazon Kinesis Firehose as data format conversion configuration, for transforming from JSON to Parquet.
 resource "aws_glue_catalog_database" "database" {
