@@ -1013,21 +1013,19 @@ data "aws_region" "this" {}
 #
 ##logs_alb
 #
-#
+#S3 Bucket to store WebACL Traffic Logs. This resource is needed by Amazon Kinesis Firehose as data delivery output target.
 resource "aws_s3_bucket" "webacl_traffic_information" {
   count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
   bucket = format("%s-waf-logs", module.labels.id)
   tags = module.labels.tags
 }
-
 resource "aws_s3_bucket_acl" "webacl_traffic_information" {
   count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
   bucket = join("", aws_s3_bucket.webacl_traffic_information.*.id)
   acl    = "private"
 }
-
   resource "aws_s3_bucket_versioning" "webacl_traffic_information" {
   count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
@@ -1035,8 +1033,7 @@ resource "aws_s3_bucket_acl" "webacl_traffic_information" {
   versioning_configuration {
     status = "Enabled"
   }
-  }
-
+}
 resource "aws_s3_bucket_server_side_encryption_configuration" "webacl_traffic_information" {
   count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
