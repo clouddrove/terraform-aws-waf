@@ -1013,7 +1013,8 @@ data "aws_region" "this" {}
 #
 ##logs_alb
 #
-#resource "aws_s3_bucket" "webacl_traffic_information" {
+#
+resource "aws_s3_bucket" "webacl_traffic_information" {
   count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
   bucket = format("%s-waf-logs", module.labels.id)
