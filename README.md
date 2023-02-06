@@ -19,6 +19,9 @@
 <a href="LICENSE.md">
   <img src="https://img.shields.io/badge/License-APACHE-blue.svg" alt="Licence">
 </a>
+<a href="https://github.com/clouddrove/terraform-aws-waf/actions/workflows/tfsec.yml">
+  <img src="https://github.com/clouddrove/terraform-aws-waf/actions/workflows/tfsec.yml/badge.svg" alt="tfsec">
+</a>
 <a href="https://github.com/clouddrove/terraform-aws-waf/actions/workflows/terraform.yml">
   <img src="https://github.com/clouddrove/terraform-aws-waf/actions/workflows/terraform.yml/badge.svg" alt="static-checks">
 </a>
@@ -76,6 +79,8 @@ Here is an example of how you can use this module in your inventory structure:
 ```hcl
 module "waf" {
 source      = "clouddrove/waf/aws"
+version     = "1.3.0"
+
 name                 = "waf"
 environment          = "test"
 allow_default_action = true
