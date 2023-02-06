@@ -20,7 +20,7 @@ module "waf" {
   waf_scop             = "REGIONAL"
 
   web_acl_association = true
-  resource_arn_list   = ["arn:aws:elasticloadbalancing:eu-west-1:XXXXX:loadbalancer/app/dev-XXXX-alb-api/debe6384af396e82", "arn:aws:elasticloadbalancing:eu-west-1:XXXXX:loadbalancer/app/dev-xxxxx-alb-book/74a5e1a6689f5bec"]
+  resource_arn_list   = ["arn:aws:elasticloadbalancing:eu-west-1:xxxxxxx:loadbalancer/app/alb-test/xxxxxxxxx"]
 
   visibility_config = {
     cloudwatch_metrics_enabled = true
