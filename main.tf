@@ -95,10 +95,13 @@ resource "aws_wafv2_web_acl" "main" {
             name        = lookup(managed_rule_group_statement.value, "name")
             vendor_name = lookup(managed_rule_group_statement.value, "vendor_name", "AWS")
 
-            dynamic "excluded_rule" {
-              for_each = length(lookup(managed_rule_group_statement.value, "excluded_rule", {})) == 0 ? [] : toset(lookup(managed_rule_group_statement.value, "excluded_rule"))
+            dynamic "rule_action_override" {
+              for_each = length(lookup(managed_rule_group_statement.value, "rule_action_override", {})) == 0 ? [] : toset(lookup(managed_rule_group_statement.value, "rule_action_override"))
               content {
-                name = excluded_rule.value
+                name = rule_action_override.value
+                action_to_use {
+                  count {}
+                }
               }
             }
 
@@ -1018,7 +1021,7 @@ resource "aws_s3_bucket" "webacl_traffic_information" {
   count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
   bucket = format("%s-waf-logs", module.labels.id)
-  tags = module.labels.tags
+  tags   = module.labels.tags
 }
 resource "aws_s3_bucket_acl" "webacl_traffic_information" {
   count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
@@ -1026,7 +1029,7 @@ resource "aws_s3_bucket_acl" "webacl_traffic_information" {
   bucket = join("", aws_s3_bucket.webacl_traffic_information.*.id)
   acl    = "private"
 }
-  resource "aws_s3_bucket_versioning" "webacl_traffic_information" {
+resource "aws_s3_bucket_versioning" "webacl_traffic_information" {
   count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
   bucket = join("", aws_s3_bucket.webacl_traffic_information.*.id)
@@ -1038,11 +1041,11 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "webacl_traffic_in
   count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
   bucket = join("", aws_s3_bucket.webacl_traffic_information.*.id)
- rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
     }
+  }
 }
 
 # AWS Glue Catalog Database. This resource is needed by Amazon Kinesis Firehose as data format conversion configuration, for transforming from JSON to Parquet.
@@ -1305,8 +1308,8 @@ resource "aws_kinesis_firehose_delivery_stream" "waf" {
     role_arn   = join("", aws_iam_role.firehose.*.arn)
     bucket_arn = join("", aws_s3_bucket.webacl_traffic_information.*.arn)
 
-    buffer_size     = var.firehose_buffer_size
-    buffer_interval = var.firehose_buffer_interval
+    buffering_size     = var.firehose_buffer_size
+    buffering_interval = var.firehose_buffer_interval
 
     prefix              = "logs/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}/"
     error_output_prefix = "errors/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}/!{firehose:error-output-type}"
@@ -1363,13 +1366,6 @@ resource "aws_wafv2_web_acl_logging_configuration" "main" {
         for_each = length(lookup(redacted_fields.value, "single_header", {})) == 0 ? [] : [lookup(redacted_fields.value, "single_header", {})]
         content {
           name = lookup(single_header.value, "name", null)
-        }
-      }
-
-      dynamic "single_query_argument" {
-        for_each = length(lookup(redacted_fields.value, "single_query_argument", {})) == 0 ? [] : [lookup(redacted_fields.value, "single_query_argument", {})]
-        content {
-          name = lookup(single_query_argument.value, "name", null)
         }
       }
     }
