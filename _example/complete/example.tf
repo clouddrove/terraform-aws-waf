@@ -8,7 +8,7 @@ locals {
 
 }
 module "ip_set" {
-  source       = "../../"#"clouddrove/labels/aws"
+  source = "../../" #"clouddrove/labels/aws"
   #version      = "2.0.0"
   name         = local.name
   environment  = local.environment
@@ -16,7 +16,7 @@ module "ip_set" {
 }
 
 module "waf" {
-  source       = "../../"#"clouddrove/labels/aws"
+  source = "../../" #"clouddrove/labels/aws"
   #version      = "2.0.0"
   name                 = local.name
   environment          = local.environment
