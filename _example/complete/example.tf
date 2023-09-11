@@ -1,54 +1,25 @@
----
-#
-# This is the canonical configuration for the `README.md`
-# Run `make readme` to rebuild the `README.md`
-#
+provider "aws" {
+  region = "eu-west-1"
+}
 
-# Name of this project
-name: Terraform AWS WAF
+locals {
+  name        = "waf"
+  environment = "test"
 
-# License of this project
-license: "APACHE"
+}
+module "ip_set" {
+  source       = "../../"#"clouddrove/labels/aws"
+  #version      = "2.0.0"
+  name         = local.name
+  environment  = local.environment
+  ip_addresses = ["51.79.69.69/32"]
+}
 
-# Canonical GitHub repo
-github_repo: clouddrove/terraform--aws-waf
-
-# Badges to display
-badges:
-  - name: "Latest Release"
-    image: "https://img.shields.io/github/release/clouddrove/terraform-aws-waf.svg"
-    url: "https://github.com/clouddrove/terraform-aws-waf/releases/latest"
-  - name: "tfsec"
-    image: "https://github.com/clouddrove/terraform-aws-waf/actions/workflows/tfsec.yml/badge.svg"
-    url: "https://github.com/clouddrove/terraform-aws-waf/actions/workflows/tfsec.yml"
-  - name: "Licence"
-    image: "https://img.shields.io/badge/License-APACHE-blue.svg"
-    url: "LICENSE.md"
-
-prerequesties:
-  - name: Terraform 1.4.6
-    url: https://learn.hashicorp.com/terraform/getting-started/install.html
-
-#  description of this project
-description: |-
-  Terraform module to create waf on AWS.
-
-# extra content
-# please not remove these two If you need add more
-include:
-  - "terraform.md"
-
-# How to use this project
-# yamllint disable rule:line-length
-usage: |-
-  ### Simple example
-  Here is an example of how you can use this module in your inventory structure:
-  ```hcl
-  module "waf" {
-  source  = "clouddrove/labels/aws"
-  version = "2.0.0"
-  name                 = "waf"
-  environment          = "test"
+module "waf" {
+  source       = "../../"#"clouddrove/labels/aws"
+  #version      = "2.0.0"
+  name                 = local.name
+  environment          = local.environment
   allow_default_action = false
   waf_enabled          = true
   waf_scop             = "REGIONAL"
@@ -62,7 +33,7 @@ usage: |-
   }
 
   rules = [
-     # ip  set statement rules. 30
+    # ip  set statement rules. 30
     {
       name     = "whitelist-ip-set"
       priority = "0"
@@ -377,5 +348,4 @@ usage: |-
       }
     ]
   }
-  }
-  ```
+}

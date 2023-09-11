@@ -21,7 +21,7 @@ variable "repository" {
 
 variable "label_order" {
   type        = list(any)
-  default     = []
+  default     = ["name", "environment"]
   description = "Label order, e.g. `name`,`application`."
 }
 
@@ -43,6 +43,11 @@ variable "tags" {
   description = "Additional tags (e.g. map(`BusinessUnit`,`XYZ`)."
 }
 
+variable "enable" {
+  type        = bool
+  default     = true
+  description = "Flag to control the vpc creation."
+}
 
 variable "waf_enabled" {
   type        = bool

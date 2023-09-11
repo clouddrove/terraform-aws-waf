@@ -16,7 +16,7 @@ module "labels" {
 #Module      : WAF
 #Description : Provides a WAFv2 IP Set Resource.
 resource "aws_wafv2_ip_set" "main" {
-  count = var.ip_addresses != null ? 1 : 0
+  count = var.enable && var.ip_addresses != null ? 1 : 0
 
   name               = format("ip-%s", module.labels.id)
   scope              = var.waf_scop
@@ -28,9 +28,9 @@ resource "aws_wafv2_ip_set" "main" {
 #Module      : WAF
 #Description : Terraform module to create WAF resource on AWS.
 resource "aws_wafv2_web_acl" "main" {
-  count       = var.waf_enabled ? 1 : 0
+  count       = var.enable && var.waf_enabled ? 1 : 0
   name        = module.labels.id
-  description = "WAFv2 ACL for ${module.labels.id}"
+  description = "WAFv2 ACL for"
   scope       = var.waf_scop
 
   default_action {
@@ -95,15 +95,98 @@ resource "aws_wafv2_web_acl" "main" {
             name        = lookup(managed_rule_group_statement.value, "name")
             vendor_name = lookup(managed_rule_group_statement.value, "vendor_name", "AWS")
 
-            dynamic "rule_action_override" {
-              for_each = length(lookup(managed_rule_group_statement.value, "rule_action_override", {})) == 0 ? [] : toset(lookup(managed_rule_group_statement.value, "rule_action_override"))
-              content {
-                name = rule_action_override.value
-                action_to_use {
-                  count {}
-                }
-              }
-            }
+            # dynamic "rule_action_override" {
+            #   for_each = length(lookup(managed_rule_group_statement.value, "rule_action_override", {})) == 0 ? [] : [lookup(managed_rule_group_statement.value, "rule_action_override", {})]
+
+            #   content {
+            #     name = rule_action_override.key
+
+            #     # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_web_acl#action-block
+            #     action_to_use {
+            #       # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_web_acl#allow-block
+            #       dynamic "allow" {
+            #         for_each = (lookup(rule_action_override.value, "action", {})) == "allow" ? [] : [lookup(rule_action_override.value, "action", {})]
+            #         #for_each = rule_action_override.value.action == "allow" ? [1] : []
+            #         content {
+            #           dynamic "custom_request_handling" {
+            #             for_each = lookup(rule_action_override.value, "custom_request_handling", null) != null ? [1] : []
+            #             content {
+            #               insert_header {
+            #                 name  = rule_action_override.value.custom_request_handling.insert_header.name
+            #                 value = rule_action_override.value.custom_request_handling.insert_header.value
+            #               }
+            #             }
+            #           }
+            #         }
+            #       }
+            #       # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_web_acl#block-block
+            #       dynamic "block" {
+            #         for_each = (lookup(rule_action_override.value, "action", {})) == "block" ? [] : [lookup(rule_action_override.value, "action", {})]
+            #         content {
+            #           dynamic "custom_response" {
+            #             for_each = lookup(rule_action_override.value, "custom_response", null) != null ? [1] : []
+            #             content {
+            #               response_code            = rule_action_override.value.custom_response.response_code
+            #               custom_response_body_key = lookup(rule_action_override.value.custom_response, "custom_response_body_key", null)
+            #               dynamic "response_header" {
+            #                 for_each = lookup(rule_action_override.value.custom_response, "response_header", null) != null ? [1] : []
+            #                 content {
+            #                   name  = rule_action_override.value.custom_response.response_header.name
+            #                   value = rule_action_override.value.custom_response.response_header.value
+            #                 }
+            #               }
+            #             }
+            #           }
+            #         }
+            #       }
+            #       # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_web_acl#count-block
+            #       dynamic "count" {
+            #         for_each = (lookup(rule_action_override.value, "action", {})) == "count" ? [] : [lookup(rule_action_override.value, "count", {})]
+            #         content {
+            #           dynamic "custom_request_handling" {
+            #             for_each = lookup(rule_action_override.value, "custom_request_handling", null) != null ? [1] : []
+            #             content {
+            #               insert_header {
+            #                 name  = rule_action_override.value.custom_request_handling.insert_header.name
+            #                 value = rule_action_override.value.custom_request_handling.insert_header.value
+            #               }
+            #             }
+            #           }
+            #         }
+            #       }
+            #       # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_web_acl#captcha-block
+            #       dynamic "captcha" {
+            #         for_each = (lookup(rule_action_override.value, "action", {})) == "block" ? [] : [lookup(rule_action_override.value, "captcha", {})]
+            #         content {
+            #           dynamic "custom_request_handling" {
+            #             for_each = lookup(rule_action_override.value, "custom_request_handling", null) != null ? [1] : []
+            #             content {
+            #               insert_header {
+            #                 name  = rule_action_override.value.custom_request_handling.insert_header.name
+            #                 value = rule_action_override.value.custom_request_handling.insert_header.value
+            #               }
+            #             }
+            #           }
+            #         }
+            #       }
+            #       # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_web_acl#challenge-block
+            #       dynamic "challenge" {
+            #         for_each = (lookup(rule_action_override.value, "action", {})) == "challenge" ? [] : [lookup(rule_action_override.value, "challenge", {})]
+            #         content {
+            #           dynamic "custom_request_handling" {
+            #             for_each = lookup(rule_action_override.value, "custom_request_handling", null) != null ? [1] : []
+            #             content {
+            #               insert_header {
+            #                 name  = rule_action_override.value.custom_request_handling.insert_header.name
+            #                 value = rule_action_override.value.custom_request_handling.insert_header.value
+            #               }
+            #             }
+            #           }
+            #         }
+            #       }
+            #     }
+            #   }
+            # }
 
             dynamic "scope_down_statement" {
               for_each = length(lookup(managed_rule_group_statement.value, "scope_down_statement", {})) == 0 ? [] : [lookup(managed_rule_group_statement.value, "scope_down_statement", {})]
@@ -376,7 +459,7 @@ resource "aws_wafv2_web_acl" "main" {
               for_each = length(lookup(byte_match_statement.value, "field_to_match", {})) == 0 ? [] : [lookup(byte_match_statement.value, "field_to_match", {})]
               content {
                 dynamic "uri_path" {
-                  for_each = length(lookup(field_to_match.value, "uri_path", {})) == 0 ? [] : [lookup(field_to_match.value, "uri_path")]
+                  for_each = lookup(field_to_match.value, "uri_path", null) != null ? [1] : []
                   content {}
                 }
                 dynamic "all_query_arguments" {
@@ -425,7 +508,6 @@ resource "aws_wafv2_web_acl" "main" {
             arn = lookup(ip_set_reference_statement.value, "arn")
           }
         }
-
         dynamic "size_constraint_statement" {
           for_each = length(lookup(rule.value, "size_constraint_statement", {})) == 0 ? [] : [lookup(rule.value, "size_constraint_statement", {})]
           content {
@@ -437,7 +519,7 @@ resource "aws_wafv2_web_acl" "main" {
                   content {}
                 }
                 dynamic "all_query_arguments" {
-                  for_each = length(lookup(field_to_match.value, "all_query_arguments", {})) == 0 ? [] : [lookup(field_to_match.value, "all_query_arguments")]
+                  for_each = lookup(field_to_match.value, "all_query_arguments", null) != null ? [1] : []
                   content {}
                 }
                 dynamic "body" {
@@ -747,6 +829,223 @@ resource "aws_wafv2_web_acl" "main" {
           }
         }
 
+        dynamic "xss_match_statement" {
+          for_each = lookup(rule.value, "xss_match_statement", null) != null ? [rule.value.xss_match_statement] : []
+
+          content {
+
+            dynamic "field_to_match" {
+              for_each = lookup(rule.value.xss_match_statement, "field_to_match", null) != null ? [rule.value.xss_match_statement.field_to_match] : []
+
+              content {
+                dynamic "all_query_arguments" {
+                  for_each = lookup(field_to_match.value, "all_query_arguments", null) != null ? [1] : []
+
+                  content {}
+                }
+
+                dynamic "body" {
+                  for_each = lookup(field_to_match.value, "body", null) != null ? [1] : []
+
+                  content {}
+                }
+
+                dynamic "method" {
+                  for_each = lookup(field_to_match.value, "method", null) != null ? [1] : []
+
+                  content {}
+                }
+
+                dynamic "query_string" {
+                  for_each = lookup(field_to_match.value, "query_string", null) != null ? [1] : []
+
+                  content {}
+                }
+
+                dynamic "single_header" {
+                  for_each = lookup(field_to_match.value, "single_header", null) != null ? [field_to_match.value.single_header] : []
+
+                  content {
+                    name = single_header.value.name
+                  }
+                }
+
+                dynamic "single_query_argument" {
+                  for_each = lookup(field_to_match.value, "single_query_argument", null) != null ? [field_to_match.value.single_query_argument] : []
+
+                  content {
+                    name = single_query_argument.value.name
+                  }
+                }
+
+                dynamic "uri_path" {
+                  for_each = lookup(field_to_match.value, "uri_path", null) != null ? [1] : []
+
+                  content {}
+                }
+              }
+            }
+
+            dynamic "text_transformation" {
+              for_each = lookup(rule.value.xss_match_statement, "text_transformation", null) != null ? [
+                for rule in lookup(rule.value.xss_match_statement, "text_transformation") : {
+                  priority = rule.priority
+                  type     = rule.type
+              }] : []
+
+              content {
+                priority = text_transformation.value.priority
+                type     = text_transformation.value.type
+              }
+            }
+          }
+        }
+
+        dynamic "sqli_match_statement" {
+          for_each = lookup(rule.value, "sqli_match_statement", null) != null ? [rule.value.sqli_match_statement] : []
+
+          content {
+
+            dynamic "field_to_match" {
+              for_each = lookup(rule.value.sqli_match_statement, "field_to_match", null) != null ? [rule.value.sqli_match_statement.field_to_match] : []
+
+              content {
+                dynamic "all_query_arguments" {
+                  for_each = lookup(field_to_match.value, "all_query_arguments", null) != null ? [1] : []
+
+                  content {}
+                }
+
+                dynamic "body" {
+                  for_each = lookup(field_to_match.value, "body", null) != null ? [1] : []
+
+                  content {}
+                }
+
+                dynamic "method" {
+                  for_each = lookup(field_to_match.value, "method", null) != null ? [1] : []
+
+                  content {}
+                }
+
+                dynamic "query_string" {
+                  for_each = lookup(field_to_match.value, "query_string", null) != null ? [1] : []
+
+                  content {}
+                }
+
+                dynamic "single_header" {
+                  for_each = lookup(field_to_match.value, "single_header", null) != null ? [field_to_match.value.single_header] : []
+
+                  content {
+                    name = single_header.value.name
+                  }
+                }
+
+                dynamic "single_query_argument" {
+                  for_each = lookup(field_to_match.value, "single_query_argument", null) != null ? [field_to_match.value.single_query_argument] : []
+
+                  content {
+                    name = single_query_argument.value.name
+                  }
+                }
+
+                dynamic "uri_path" {
+                  for_each = lookup(field_to_match.value, "uri_path", null) != null ? [1] : []
+
+                  content {}
+                }
+              }
+            }
+
+            dynamic "text_transformation" {
+              for_each = lookup(rule.value.sqli_match_statement, "text_transformation", null) != null ? [
+                for rule in lookup(rule.value.sqli_match_statement, "text_transformation") : {
+                  priority = rule.priority
+                  type     = rule.type
+              }] : []
+
+              content {
+                priority = text_transformation.value.priority
+                type     = text_transformation.value.type
+              }
+            }
+          }
+        }
+
+        dynamic "regex_match_statement" {
+          for_each = lookup(rule.value, "regex_match_statement", null) != null ? [rule.value.regex_match_statement] : []
+
+          content {
+            regex_string = regex_match_statement.value.regex_string
+
+            dynamic "field_to_match" {
+              for_each = lookup(rule.value.regex_match_statement, "field_to_match", null) != null ? [rule.value.regex_match_statement.field_to_match] : []
+
+              content {
+                dynamic "all_query_arguments" {
+                  for_each = lookup(field_to_match.value, "all_query_arguments", null) != null ? [1] : []
+
+                  content {}
+                }
+
+                dynamic "body" {
+                  for_each = lookup(field_to_match.value, "body", null) != null ? [1] : []
+
+                  content {}
+                }
+
+                dynamic "method" {
+                  for_each = lookup(field_to_match.value, "method", null) != null ? [1] : []
+
+                  content {}
+                }
+
+                dynamic "query_string" {
+                  for_each = lookup(field_to_match.value, "query_string", null) != null ? [1] : []
+
+                  content {}
+                }
+
+                dynamic "single_header" {
+                  for_each = lookup(field_to_match.value, "single_header", null) != null ? [field_to_match.value.single_header] : []
+
+                  content {
+                    name = single_header.value.name
+                  }
+                }
+
+                dynamic "single_query_argument" {
+                  for_each = lookup(field_to_match.value, "single_query_argument", null) != null ? [field_to_match.value.single_query_argument] : []
+
+                  content {
+                    name = single_query_argument.value.name
+                  }
+                }
+
+                dynamic "uri_path" {
+                  for_each = lookup(field_to_match.value, "uri_path", null) != null ? [1] : []
+
+                  content {}
+                }
+              }
+            }
+
+            dynamic "text_transformation" {
+              for_each = lookup(rule.value.regex_match_statement, "text_transformation", null) != null ? [
+                for rule in lookup(rule.value.regex_match_statement, "text_transformation") : {
+                  priority = rule.priority
+                  type     = rule.type
+              }] : []
+
+              content {
+                priority = text_transformation.value.priority
+                type     = text_transformation.value.type
+              }
+            }
+          }
+        }
+
         ### NOT STATEMENTS
         dynamic "not_statement" {
           for_each = length(lookup(rule.value, "not_statement", {})) == 0 ? [] : [lookup(rule.value, "not_statement", {})]
@@ -990,7 +1289,7 @@ resource "aws_wafv2_web_acl" "main" {
 # WAFv2 web acl association with ALB
 #####
 resource "aws_wafv2_web_acl_association" "main" {
-  count = var.waf_enabled && var.web_acl_association && length(var.resource_arn_list) == 0 ? 1 : 0
+  count = var.enable && var.waf_enabled && var.web_acl_association && length(var.resource_arn_list) > 0 ? 1 : 0
 
   resource_arn = var.resource_arn
   web_acl_arn  = join("", aws_wafv2_web_acl.main.*.arn)
@@ -999,7 +1298,7 @@ resource "aws_wafv2_web_acl_association" "main" {
 }
 
 resource "aws_wafv2_web_acl_association" "alb_list" {
-  count = var.waf_enabled && var.web_acl_association && length(var.resource_arn_list) > 0 ? length(var.resource_arn_list) : 0
+  count = var.enable && var.waf_enabled && var.web_acl_association && length(var.resource_arn_list) > 0 ? length(var.resource_arn_list) : 0
 
   resource_arn = var.resource_arn_list[count.index]
   web_acl_arn  = join("", aws_wafv2_web_acl.main.*.arn)
@@ -1018,19 +1317,31 @@ data "aws_region" "this" {}
 #
 #S3 Bucket to store WebACL Traffic Logs. This resource is needed by Amazon Kinesis Firehose as data delivery output target.
 resource "aws_s3_bucket" "webacl_traffic_information" {
-  count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
+  count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
   bucket = format("%s-waf-logs", module.labels.id)
   tags   = module.labels.tags
 }
+
+resource "aws_s3_bucket_ownership_controls" "webacl_traffic_information" {
+  count  = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
+  bucket = join("", aws_s3_bucket.webacl_traffic_information.*.id)
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
 resource "aws_s3_bucket_acl" "webacl_traffic_information" {
-  count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
+  count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
   bucket = join("", aws_s3_bucket.webacl_traffic_information.*.id)
   acl    = "private"
+  depends_on = [
+    aws_s3_bucket_ownership_controls.webacl_traffic_information
+  ]
 }
 resource "aws_s3_bucket_versioning" "webacl_traffic_information" {
-  count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
+  count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
   bucket = join("", aws_s3_bucket.webacl_traffic_information.*.id)
   versioning_configuration {
@@ -1038,7 +1349,7 @@ resource "aws_s3_bucket_versioning" "webacl_traffic_information" {
   }
 }
 resource "aws_s3_bucket_server_side_encryption_configuration" "webacl_traffic_information" {
-  count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
+  count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
   bucket = join("", aws_s3_bucket.webacl_traffic_information.*.id)
   rule {
@@ -1050,7 +1361,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "webacl_traffic_in
 
 # AWS Glue Catalog Database. This resource is needed by Amazon Kinesis Firehose as data format conversion configuration, for transforming from JSON to Parquet.
 resource "aws_glue_catalog_database" "database" {
-  count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
+  count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
   name        = format("glue-%s", module.labels.id)
   description = "Glue Catalog Database for ${lower(module.labels.id)} WAF Logs"
@@ -1058,7 +1369,7 @@ resource "aws_glue_catalog_database" "database" {
 
 # This table store column information that is needed by Amazon Kinesis Firehose as data format conversion configuration, for transforming from JSON to Parquet.
 resource "aws_glue_catalog_table" "table" {
-  count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
+  count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
   name          = format("glue-table-%s", module.labels.id)
   database_name = join("", aws_glue_catalog_database.database.*.name)
@@ -1152,7 +1463,7 @@ resource "aws_glue_catalog_table" "table" {
 
 # This log group is needed by Amazon Kinesis Firehose for storing delivery error information.
 resource "aws_cloudwatch_log_group" "firehose_error_logs" {
-  count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
+  count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
   name              = "/aws/kinesisfirehose/aws-waf-logs-${lower(module.labels.id)}-WebACL"
   retention_in_days = "30"
@@ -1162,7 +1473,7 @@ resource "aws_cloudwatch_log_group" "firehose_error_logs" {
 
 # This log stream is the one which hold the information inside the log group above.
 resource "aws_cloudwatch_log_stream" "firehose_error_logs" {
-  count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
+  count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
   name           = module.labels.id
   log_group_name = join("", aws_cloudwatch_log_group.firehose_error_logs.*.name)
@@ -1187,7 +1498,7 @@ data "aws_iam_policy_document" "firehose_assume_role_policy" {
 
 # IAM Role for the Firehose, so it able to access those resources above.
 resource "aws_iam_role" "firehose" {
-  count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
+  count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
 
   name        = format("ServiceRoleForFirehose_%s_WebACL", module.labels.id)
@@ -1232,7 +1543,7 @@ data "aws_iam_policy_document" "allow_s3_actions" {
 
 # Attach the policy above to the bucket.
 resource "aws_s3_bucket_policy" "webacl_traffic_information_lb" {
-  count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
+  count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
   bucket = join("", aws_s3_bucket.webacl_traffic_information.*.id)
   policy = data.aws_iam_policy_document.allow_s3_actions.json
@@ -1257,7 +1568,7 @@ data "aws_iam_policy_document" "allow_put_log_events" {
 
 # Attach the policy above to the IAM Role.
 resource "aws_iam_role_policy" "allow_put_log_events" {
-  count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
+  count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
   name = "AllowWritingToLogStreams"
   role = join("", aws_iam_role.firehose.*.name)
@@ -1287,7 +1598,7 @@ data "aws_iam_policy_document" "allow_glue_get_table_versions" {
 
 # Attach the policy above to the IAM Role.
 resource "aws_iam_role_policy" "allow_glue_get_table_versions" {
-  count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
+  count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
   name = format("AllowGettingGlueTableVersions-%s", module.labels.id)
   role = join("", aws_iam_role.firehose.*.name)
@@ -1297,7 +1608,7 @@ resource "aws_iam_role_policy" "allow_glue_get_table_versions" {
 
 # Creating the Firehose.
 resource "aws_kinesis_firehose_delivery_stream" "waf" {
-  count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
+  count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
   name        = format("aws-waf-logs-%s", module.labels.id)
   destination = "extended_s3"
@@ -1354,7 +1665,7 @@ resource "aws_kinesis_firehose_delivery_stream" "waf" {
 # WAFv2 web acl logging configuration with kinesis firehose
 #####
 resource "aws_wafv2_web_acl_logging_configuration" "main" {
-  count = var.waf_enabled && var.create_logging_configuration ? 1 : 0
+  count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
   log_destination_configs = [join("", aws_kinesis_firehose_delivery_stream.waf.*.arn)]
   resource_arn            = join("", aws_wafv2_web_acl.main.*.arn)
