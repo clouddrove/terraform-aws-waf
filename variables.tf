@@ -143,3 +143,21 @@ variable "logging_filter" {
   default     = {}
   description = "A configuration block that specifies which web requests are kept in the logs and which are dropped. You can filter on the rule action and on the web request labels that were applied by matching rules during web ACL evaluation."
 }
+
+variable "kms_key_deletion_window" {
+  type        = number
+  default     = 10
+  description = "KMS Key deletion window in days."
+}
+
+variable "enable_key_rotation" {
+  type        = bool
+  default     = true
+  description = "Specifies whether key rotation is enabled. Defaults to true(security best practice)"
+}
+
+variable "s3_sse_algorithm" {
+  type        = string
+  default     = "aws:kms"
+  description = "Server-side encryption algorithm to use. Valid values are AES256 and aws:kms"
+}

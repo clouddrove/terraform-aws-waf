@@ -1315,6 +1315,59 @@ data "aws_region" "this" {}
 #
 ##logs_alb
 #
+
+##-----------------------------------------------------------------------------
+## Below resource will create kms key. This key will used for encryption of flow logs stored in S3 bucket or cloudwatch log group. 
+##-----------------------------------------------------------------------------
+
+resource "aws_kms_key" "kms" {
+  count                   = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
+  deletion_window_in_days = var.kms_key_deletion_window
+  enable_key_rotation     = var.enable_key_rotation
+}
+
+resource "aws_kms_alias" "kms-alias" {
+  count         = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
+  name          = format("alias/%s-flow-log-key", module.labels.id)
+  target_key_id = aws_kms_key.kms[0].key_id
+}
+
+##-----------------------------------------------------------------------------
+## Below resource will attach policy to above created kms key. The above created key require policy to be attached so that cloudwatch log group can access it. 
+## It will be only created when vpc flow logs are stored in cloudwatch log group. 
+##-----------------------------------------------------------------------------
+resource "aws_kms_key_policy" "example" {
+  count  = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
+  key_id = aws_kms_key.kms[0].id
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Id" : "key-default-1",
+    "Statement" : [{
+      "Sid" : "Enable IAM User Permissions",
+      "Effect" : "Allow",
+      "Principal" : {
+        "AWS" : "arn:aws:iam::${data.aws_caller_identity.this.account_id}:root"
+      },
+      "Action" : "kms:*",
+      "Resource" : "*"
+      },
+      {
+        "Effect" : "Allow",
+        "Principal" : { "Service" : "logs.${data.aws_region.this.name}.amazonaws.com" },
+        "Action" : [
+          "kms:Encrypt*",
+          "kms:Decrypt*",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:Describe*"
+        ],
+        "Resource" : "*"
+      }
+    ]
+  })
+
+}
+
 #S3 Bucket to store WebACL Traffic Logs. This resource is needed by Amazon Kinesis Firehose as data delivery output target.
 resource "aws_s3_bucket" "webacl_traffic_information" {
   count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
@@ -1340,6 +1393,27 @@ resource "aws_s3_bucket_acl" "webacl_traffic_information" {
     aws_s3_bucket_ownership_controls.webacl_traffic_information
   ]
 }
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "example" {
+  count  = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
+  bucket = join("", aws_s3_bucket.webacl_traffic_information.*.id)
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.kms[0].arn
+      sse_algorithm     = var.s3_sse_algorithm //"aws:kms"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "example" {
+  count                   = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
+  bucket                  = join("", aws_s3_bucket.webacl_traffic_information.*.id)
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 resource "aws_s3_bucket_versioning" "webacl_traffic_information" {
   count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
@@ -1467,6 +1541,7 @@ resource "aws_cloudwatch_log_group" "firehose_error_logs" {
 
   name              = "/aws/kinesisfirehose/aws-waf-logs-${lower(module.labels.id)}-WebACL"
   retention_in_days = "30"
+  kms_key_id        = aws_kms_key.kms[0].arn
 
   tags = module.labels.tags
 }
