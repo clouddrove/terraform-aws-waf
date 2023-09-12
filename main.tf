@@ -95,99 +95,6 @@ resource "aws_wafv2_web_acl" "main" {
             name        = lookup(managed_rule_group_statement.value, "name")
             vendor_name = lookup(managed_rule_group_statement.value, "vendor_name", "AWS")
 
-            # dynamic "rule_action_override" {
-            #   for_each = length(lookup(managed_rule_group_statement.value, "rule_action_override", {})) == 0 ? [] : [lookup(managed_rule_group_statement.value, "rule_action_override", {})]
-
-            #   content {
-            #     name = rule_action_override.key
-
-            #     # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_web_acl#action-block
-            #     action_to_use {
-            #       # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_web_acl#allow-block
-            #       dynamic "allow" {
-            #         for_each = (lookup(rule_action_override.value, "action", {})) == "allow" ? [] : [lookup(rule_action_override.value, "action", {})]
-            #         #for_each = rule_action_override.value.action == "allow" ? [1] : []
-            #         content {
-            #           dynamic "custom_request_handling" {
-            #             for_each = lookup(rule_action_override.value, "custom_request_handling", null) != null ? [1] : []
-            #             content {
-            #               insert_header {
-            #                 name  = rule_action_override.value.custom_request_handling.insert_header.name
-            #                 value = rule_action_override.value.custom_request_handling.insert_header.value
-            #               }
-            #             }
-            #           }
-            #         }
-            #       }
-            #       # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_web_acl#block-block
-            #       dynamic "block" {
-            #         for_each = (lookup(rule_action_override.value, "action", {})) == "block" ? [] : [lookup(rule_action_override.value, "action", {})]
-            #         content {
-            #           dynamic "custom_response" {
-            #             for_each = lookup(rule_action_override.value, "custom_response", null) != null ? [1] : []
-            #             content {
-            #               response_code            = rule_action_override.value.custom_response.response_code
-            #               custom_response_body_key = lookup(rule_action_override.value.custom_response, "custom_response_body_key", null)
-            #               dynamic "response_header" {
-            #                 for_each = lookup(rule_action_override.value.custom_response, "response_header", null) != null ? [1] : []
-            #                 content {
-            #                   name  = rule_action_override.value.custom_response.response_header.name
-            #                   value = rule_action_override.value.custom_response.response_header.value
-            #                 }
-            #               }
-            #             }
-            #           }
-            #         }
-            #       }
-            #       # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_web_acl#count-block
-            #       dynamic "count" {
-            #         for_each = (lookup(rule_action_override.value, "action", {})) == "count" ? [] : [lookup(rule_action_override.value, "count", {})]
-            #         content {
-            #           dynamic "custom_request_handling" {
-            #             for_each = lookup(rule_action_override.value, "custom_request_handling", null) != null ? [1] : []
-            #             content {
-            #               insert_header {
-            #                 name  = rule_action_override.value.custom_request_handling.insert_header.name
-            #                 value = rule_action_override.value.custom_request_handling.insert_header.value
-            #               }
-            #             }
-            #           }
-            #         }
-            #       }
-            #       # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_web_acl#captcha-block
-            #       dynamic "captcha" {
-            #         for_each = (lookup(rule_action_override.value, "action", {})) == "block" ? [] : [lookup(rule_action_override.value, "captcha", {})]
-            #         content {
-            #           dynamic "custom_request_handling" {
-            #             for_each = lookup(rule_action_override.value, "custom_request_handling", null) != null ? [1] : []
-            #             content {
-            #               insert_header {
-            #                 name  = rule_action_override.value.custom_request_handling.insert_header.name
-            #                 value = rule_action_override.value.custom_request_handling.insert_header.value
-            #               }
-            #             }
-            #           }
-            #         }
-            #       }
-            #       # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_web_acl#challenge-block
-            #       dynamic "challenge" {
-            #         for_each = (lookup(rule_action_override.value, "action", {})) == "challenge" ? [] : [lookup(rule_action_override.value, "challenge", {})]
-            #         content {
-            #           dynamic "custom_request_handling" {
-            #             for_each = lookup(rule_action_override.value, "custom_request_handling", null) != null ? [1] : []
-            #             content {
-            #               insert_header {
-            #                 name  = rule_action_override.value.custom_request_handling.insert_header.name
-            #                 value = rule_action_override.value.custom_request_handling.insert_header.value
-            #               }
-            #             }
-            #           }
-            #         }
-            #       }
-            #     }
-            #   }
-            # }
-
             dynamic "scope_down_statement" {
               for_each = length(lookup(managed_rule_group_statement.value, "scope_down_statement", {})) == 0 ? [] : [lookup(managed_rule_group_statement.value, "scope_down_statement", {})]
               content {
@@ -1266,7 +1173,7 @@ resource "aws_wafv2_web_acl" "main" {
         for_each = length(lookup(rule.value, "visibility_config")) == 0 ? [] : [lookup(rule.value, "visibility_config", {})]
         content {
           cloudwatch_metrics_enabled = lookup(visibility_config.value, "cloudwatch_metrics_enabled", true)
-          metric_name                = lookup(visibility_config.value, "metric_name", "${module.labels.id}")
+          metric_name                = lookup(visibility_config.value, "metric_name", module.labels.id)
           sampled_requests_enabled   = lookup(visibility_config.value, "sampled_requests_enabled", true)
         }
       }
@@ -1279,7 +1186,7 @@ resource "aws_wafv2_web_acl" "main" {
     for_each = length(var.visibility_config) == 0 ? [] : [var.visibility_config]
     content {
       cloudwatch_metrics_enabled = lookup(visibility_config.value, "cloudwatch_metrics_enabled", true)
-      metric_name                = lookup(visibility_config.value, "metric_name", "${module.labels.id}")
+      metric_name                = lookup(visibility_config.value, "metric_name", module.labels.id)
       sampled_requests_enabled   = lookup(visibility_config.value, "sampled_requests_enabled", true)
     }
   }
@@ -1292,7 +1199,7 @@ resource "aws_wafv2_web_acl_association" "main" {
   count = var.enable && var.waf_enabled && var.web_acl_association && length(var.resource_arn_list) > 0 ? 1 : 0
 
   resource_arn = var.resource_arn
-  web_acl_arn  = join("", aws_wafv2_web_acl.main.*.arn)
+  web_acl_arn  = join("", aws_wafv2_web_acl.main[*].arn)
 
   depends_on = [aws_wafv2_web_acl.main]
 }
@@ -1301,7 +1208,7 @@ resource "aws_wafv2_web_acl_association" "alb_list" {
   count = var.enable && var.waf_enabled && var.web_acl_association && length(var.resource_arn_list) > 0 ? length(var.resource_arn_list) : 0
 
   resource_arn = var.resource_arn_list[count.index]
-  web_acl_arn  = join("", aws_wafv2_web_acl.main.*.arn)
+  web_acl_arn  = join("", aws_wafv2_web_acl.main[*].arn)
 
   depends_on = [aws_wafv2_web_acl.main]
 }
@@ -1378,7 +1285,7 @@ resource "aws_s3_bucket" "webacl_traffic_information" {
 
 resource "aws_s3_bucket_ownership_controls" "webacl_traffic_information" {
   count  = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
-  bucket = join("", aws_s3_bucket.webacl_traffic_information.*.id)
+  bucket = join("", aws_s3_bucket.webacl_traffic_information[*].id)
   rule {
     object_ownership = "BucketOwnerPreferred"
   }
@@ -1387,7 +1294,7 @@ resource "aws_s3_bucket_ownership_controls" "webacl_traffic_information" {
 resource "aws_s3_bucket_acl" "webacl_traffic_information" {
   count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
-  bucket = join("", aws_s3_bucket.webacl_traffic_information.*.id)
+  bucket = join("", aws_s3_bucket.webacl_traffic_information[*].id)
   acl    = "private"
   depends_on = [
     aws_s3_bucket_ownership_controls.webacl_traffic_information
@@ -1396,7 +1303,7 @@ resource "aws_s3_bucket_acl" "webacl_traffic_information" {
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "example" {
   count  = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
-  bucket = join("", aws_s3_bucket.webacl_traffic_information.*.id)
+  bucket = join("", aws_s3_bucket.webacl_traffic_information[*].id)
   rule {
     apply_server_side_encryption_by_default {
       kms_master_key_id = aws_kms_key.kms[0].arn
@@ -1407,7 +1314,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "example" {
 
 resource "aws_s3_bucket_public_access_block" "example" {
   count                   = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
-  bucket                  = join("", aws_s3_bucket.webacl_traffic_information.*.id)
+  bucket                  = join("", aws_s3_bucket.webacl_traffic_information[*].id)
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
@@ -1417,7 +1324,7 @@ resource "aws_s3_bucket_public_access_block" "example" {
 resource "aws_s3_bucket_versioning" "webacl_traffic_information" {
   count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
-  bucket = join("", aws_s3_bucket.webacl_traffic_information.*.id)
+  bucket = join("", aws_s3_bucket.webacl_traffic_information[*].id)
   versioning_configuration {
     status = "Enabled"
   }
@@ -1425,7 +1332,7 @@ resource "aws_s3_bucket_versioning" "webacl_traffic_information" {
 resource "aws_s3_bucket_server_side_encryption_configuration" "webacl_traffic_information" {
   count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
-  bucket = join("", aws_s3_bucket.webacl_traffic_information.*.id)
+  bucket = join("", aws_s3_bucket.webacl_traffic_information[*].id)
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm = "AES256"
@@ -1446,7 +1353,7 @@ resource "aws_glue_catalog_table" "table" {
   count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
   name          = format("glue-table-%s", module.labels.id)
-  database_name = join("", aws_glue_catalog_database.database.*.name)
+  database_name = join("", aws_glue_catalog_database.database[*].name)
 
   description = "Table which stores schema of WAF Logs for ${lower(module.labels.id)} WebACL"
 
@@ -1475,7 +1382,7 @@ resource "aws_glue_catalog_table" "table" {
   }
 
   storage_descriptor {
-    location      = "s3://${join("", aws_s3_bucket.webacl_traffic_information.*.id)}/logs"
+    location      = "s3://${join("", aws_s3_bucket.webacl_traffic_information[*].id)}/logs"
     input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
     output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
 
@@ -1551,7 +1458,7 @@ resource "aws_cloudwatch_log_stream" "firehose_error_logs" {
   count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
   name           = module.labels.id
-  log_group_name = join("", aws_cloudwatch_log_group.firehose_error_logs.*.name)
+  log_group_name = join("", aws_cloudwatch_log_group.firehose_error_logs[*].name)
 }
 
 # Policy document that will allow the Firehose to assume an IAM Role.
@@ -1596,7 +1503,7 @@ data "aws_iam_policy_document" "allow_s3_actions" {
       type = "AWS"
 
       identifiers = [
-        join("", aws_iam_role.firehose.*.arn),
+        join("", aws_iam_role.firehose[*].arn),
       ]
     }
 
@@ -1610,8 +1517,8 @@ data "aws_iam_policy_document" "allow_s3_actions" {
     ]
 
     resources = [
-      join("", aws_s3_bucket.webacl_traffic_information.*.arn),
-      "${join("", aws_s3_bucket.webacl_traffic_information.*.arn)}/*",
+      join("", aws_s3_bucket.webacl_traffic_information[*].arn),
+      "${join("", aws_s3_bucket.webacl_traffic_information[*].arn)}/*",
     ]
   }
 }
@@ -1620,7 +1527,7 @@ data "aws_iam_policy_document" "allow_s3_actions" {
 resource "aws_s3_bucket_policy" "webacl_traffic_information_lb" {
   count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
-  bucket = join("", aws_s3_bucket.webacl_traffic_information.*.id)
+  bucket = join("", aws_s3_bucket.webacl_traffic_information[*].id)
   policy = data.aws_iam_policy_document.allow_s3_actions.json
 }
 
@@ -1636,7 +1543,7 @@ data "aws_iam_policy_document" "allow_put_log_events" {
     effect = "Allow"
 
     resources = [
-      join("", aws_s3_bucket.webacl_traffic_information.*.arn),
+      join("", aws_s3_bucket.webacl_traffic_information[*].arn),
     ]
   }
 }
@@ -1646,7 +1553,7 @@ resource "aws_iam_role_policy" "allow_put_log_events" {
   count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
   name = "AllowWritingToLogStreams"
-  role = join("", aws_iam_role.firehose.*.name)
+  role = join("", aws_iam_role.firehose[*].name)
 
   policy = data.aws_iam_policy_document.allow_put_log_events.json
 }
@@ -1663,9 +1570,9 @@ data "aws_iam_policy_document" "allow_glue_get_table_versions" {
     effect = "Allow"
 
     resources = [
-      "arn:aws:glue:${data.aws_region.this.name}:${data.aws_caller_identity.this.account_id}:table/${join("", aws_glue_catalog_database.database.*.name)}/logs",
-      "arn:aws:glue:${data.aws_region.this.name}:${data.aws_caller_identity.this.account_id}:table/${join("", aws_glue_catalog_database.database.*.name)}/${join("", aws_glue_catalog_table.table.*.name)}",
-      "arn:aws:glue:${data.aws_region.this.name}:${data.aws_caller_identity.this.account_id}:database/${join("", aws_glue_catalog_database.database.*.name)}",
+      "arn:aws:glue:${data.aws_region.this.name}:${data.aws_caller_identity.this.account_id}:table/${join("", aws_glue_catalog_database.database[*].name)}/logs",
+      "arn:aws:glue:${data.aws_region.this.name}:${data.aws_caller_identity.this.account_id}:table/${join("", aws_glue_catalog_database.database[*].name)}/${join("", aws_glue_catalog_table.table[*].name)}",
+      "arn:aws:glue:${data.aws_region.this.name}:${data.aws_caller_identity.this.account_id}:database/${join("", aws_glue_catalog_database.database[*].name)}",
       "arn:aws:glue:${data.aws_region.this.name}:${data.aws_caller_identity.this.account_id}:catalog",
     ]
   }
@@ -1676,7 +1583,7 @@ resource "aws_iam_role_policy" "allow_glue_get_table_versions" {
   count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
   name = format("AllowGettingGlueTableVersions-%s", module.labels.id)
-  role = join("", aws_iam_role.firehose.*.name)
+  role = join("", aws_iam_role.firehose[*].name)
 
   policy = data.aws_iam_policy_document.allow_glue_get_table_versions.json
 }
@@ -1691,8 +1598,8 @@ resource "aws_kinesis_firehose_delivery_stream" "waf" {
   extended_s3_configuration {
 
 
-    role_arn   = join("", aws_iam_role.firehose.*.arn)
-    bucket_arn = join("", aws_s3_bucket.webacl_traffic_information.*.arn)
+    role_arn   = join("", aws_iam_role.firehose[*].arn)
+    bucket_arn = join("", aws_s3_bucket.webacl_traffic_information[*].arn)
 
     buffering_size     = var.firehose_buffer_size
     buffering_interval = var.firehose_buffer_interval
@@ -1702,8 +1609,8 @@ resource "aws_kinesis_firehose_delivery_stream" "waf" {
 
     cloudwatch_logging_options {
       enabled         = "true"
-      log_group_name  = join("", aws_cloudwatch_log_group.firehose_error_logs.*.name)
-      log_stream_name = join("", aws_cloudwatch_log_stream.firehose_error_logs.*.name)
+      log_group_name  = join("", aws_cloudwatch_log_group.firehose_error_logs[*].name)
+      log_stream_name = join("", aws_cloudwatch_log_stream.firehose_error_logs[*].name)
     }
 
     data_format_conversion_configuration {
@@ -1724,9 +1631,9 @@ resource "aws_kinesis_firehose_delivery_stream" "waf" {
       }
 
       schema_configuration {
-        role_arn      = join("", aws_iam_role.firehose.*.arn)
-        database_name = join("", aws_glue_catalog_table.table.*.database_name)
-        table_name    = join("", aws_glue_catalog_table.table.*.name)
+        role_arn      = join("", aws_iam_role.firehose[*].arn)
+        database_name = join("", aws_glue_catalog_table.table[*].database_name)
+        table_name    = join("", aws_glue_catalog_table.table[*].name)
         region        = data.aws_region.this.name
       }
     }
@@ -1742,8 +1649,8 @@ resource "aws_kinesis_firehose_delivery_stream" "waf" {
 resource "aws_wafv2_web_acl_logging_configuration" "main" {
   count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
-  log_destination_configs = [join("", aws_kinesis_firehose_delivery_stream.waf.*.arn)]
-  resource_arn            = join("", aws_wafv2_web_acl.main.*.arn)
+  log_destination_configs = [join("", aws_kinesis_firehose_delivery_stream.waf[*].arn)]
+  resource_arn            = join("", aws_wafv2_web_acl.main[*].arn)
 
   dynamic "redacted_fields" {
     for_each = var.redacted_fields

@@ -31,18 +31,6 @@ variable "managedby" {
   description = "ManagedBy, eg 'CloudDrove'"
 }
 
-variable "attributes" {
-  type        = list(any)
-  default     = []
-  description = "Additional attributes (e.g. `1`)."
-}
-
-variable "tags" {
-  type        = map(any)
-  default     = {}
-  description = "Additional tags (e.g. map(`BusinessUnit`,`XYZ`)."
-}
-
 variable "enable" {
   type        = bool
   default     = true
@@ -99,11 +87,6 @@ variable "ip_addresses" {
   type        = list(string)
   default     = null
   description = "(Required) Contains an array of strings that specify one or more IP addresses or blocks of IP addresses in Classless Inter-Domain Routing (CIDR) notation. AWS WAF supports all address ranges for IP versions IPv4 and IPv6."
-}
-
-variable "block_sensitive_paths" {
-  type    = bool
-  default = null
 }
 
 variable "rules" {
