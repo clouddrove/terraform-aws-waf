@@ -35,7 +35,7 @@ module "waf" {
   rules = [
     # ip  set statement rules. 30
     {
-      name     = "whitelist-ip-set"
+      name     = "WhitelistIpSetRule0"
       priority = "0"
       action   = "allow"
 
@@ -52,7 +52,7 @@ module "waf" {
 
     ## Byte match statement rules. 30
     {
-      name     = "byte-match-statement-rule-30"
+      name     = "ByteMatchRule30"
       priority = "30"
       action   = "allow"
 
@@ -76,7 +76,7 @@ module "waf" {
 
     ## geo_allowlist_statement_rules 90
     {
-      name     = "geo-allowlist-statement-rule-90"
+      name     = "GeoAllowlistRule90"
       priority = "90"
       action   = "count"
 
@@ -95,7 +95,7 @@ module "waf" {
 
     ## geo_match_statement_rules 60
     {
-      name     = "geo-match-statement-rule-60"
+      name     = "GeoMatchRule60"
       priority = "60"
       action   = "count"
 
@@ -175,7 +175,7 @@ module "waf" {
 
     #rate_based_statement_rules 40
     {
-      name     = "rate-based-statement-rule-40"
+      name     = "RateBasedRule40"
       priority = "40"
       action   = "block"
 
@@ -194,7 +194,7 @@ module "waf" {
 
     #regex_match_statement_rules 100
     {
-      name     = "regex-match-statement-rule-100"
+      name     = "RegexMatchRule100"
       priority = "100"
       action   = "block"
 
@@ -221,7 +221,7 @@ module "waf" {
 
     #size_constraint_statement_rules 50
     {
-      name     = "size-constraint-rule-50"
+      name     = "SizeConstraintRule50"
       priority = "50"
       action   = "block"
 
@@ -246,7 +246,7 @@ module "waf" {
 
     #sqli_match_statement_rules 70
     {
-      name     = "sqli-match-statement-rule-70"
+      name     = "SqliMatchRule70"
       priority = "70"
       action   = "block"
 
@@ -278,7 +278,7 @@ module "waf" {
 
     #xss_match_statement 80
     {
-      name     = "xsss-match-statement-rule-80"
+      name     = "XsssMatchRule80"
       priority = "80"
       action   = "block"
 
