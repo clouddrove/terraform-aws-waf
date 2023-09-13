@@ -8,16 +8,16 @@ locals {
 
 }
 module "ip_set" {
-  source = "../../" #"clouddrove/labels/aws"
-  #version      = "2.0.0"
+  source       = "../../" #"clouddrove/labels/aws"
+  version      = "2.0.0"
   name         = local.name
   environment  = local.environment
   ip_addresses = ["51.79.69.69/32"]
 }
 
 module "waf" {
-  source = "../../" #"clouddrove/labels/aws"
-  #version      = "2.0.0"
+  source               = "../../" #"clouddrove/labels/aws"
+  version              = "2.0.0"
   name                 = local.name
   environment          = local.environment
   allow_default_action = false
