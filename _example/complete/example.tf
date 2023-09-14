@@ -1,54 +1,23 @@
----
-#
-# This is the canonical configuration for the `README.md`
-# Run `make readme` to rebuild the `README.md`
-#
+provider "aws" {
+  region = "eu-west-1"
+}
 
-# Name of this project
-name: Terraform AWS WAF
+locals {
+  name        = "waf"
+  environment = "test"
 
-# License of this project
-license: "APACHE"
+}
+module "ip_set" {
+  source       = "../../"
+  name         = local.name
+  environment  = local.environment
+  ip_addresses = ["51.79.69.69/32"]
+}
 
-# Canonical GitHub repo
-github_repo: clouddrove/terraform--aws-waf
-
-# Badges to display
-badges:
-  - name: "Latest Release"
-    image: "https://img.shields.io/github/release/clouddrove/terraform-aws-waf.svg"
-    url: "https://github.com/clouddrove/terraform-aws-waf/releases/latest"
-  - name: "tfsec"
-    image: "https://github.com/clouddrove/terraform-aws-waf/actions/workflows/tfsec.yml/badge.svg"
-    url: "https://github.com/clouddrove/terraform-aws-waf/actions/workflows/tfsec.yml"
-  - name: "Licence"
-    image: "https://img.shields.io/badge/License-APACHE-blue.svg"
-    url: "LICENSE.md"
-
-prerequesties:
-  - name: Terraform 1.4.6
-    url: https://learn.hashicorp.com/terraform/getting-started/install.html
-
-#  description of this project
-description: |-
-  Terraform module to create waf on AWS.
-
-# extra content
-# please not remove these two If you need add more
-include:
-  - "terraform.md"
-
-# How to use this project
-# yamllint disable rule:line-length
-usage: |-
-  ### Simple example
-  Here is an example of how you can use this module in your inventory structure:
-  ```hcl
-  module "waf" {
-  source  = "clouddrove/labels/aws"
-  version = "2.0.0"
-  name                 = "waf"
-  environment          = "test"
+module "waf" {
+  source               = "../../"
+  name                 = local.name
+  environment          = local.environment
   allow_default_action = false
   waf_enabled          = true
   waf_scop             = "REGIONAL"
@@ -62,9 +31,9 @@ usage: |-
   }
 
   rules = [
-     # ip  set statement rules. 30
+    # ip  set statement rules. 30
     {
-      name     = "whitelist-ip-set"
+      name     = "WhitelistIpSetRule0"
       priority = "0"
       action   = "allow"
 
@@ -79,9 +48,9 @@ usage: |-
       }
     },
 
-    ## Byte match statement rules. 30
+    # ## Byte match statement rules. 30
     {
-      name     = "byte-match-statement-rule-30"
+      name     = "ByteMatchRule30"
       priority = "30"
       action   = "allow"
 
@@ -98,14 +67,14 @@ usage: |-
 
       visibility_config = {
         cloudwatch_metrics_enabled = false
-        metric_name                = "rule-30"
+        metric_name                = "ByteMatchRule30"
         sampled_requests_enabled   = false
       }
     },
 
-    ## geo_allowlist_statement_rules 90
+    # ## geo_allowlist_statement_rules 90
     {
-      name     = "geo-allowlist-statement-rule-90"
+      name     = "GeoAllowlistRule90"
       priority = "90"
       action   = "count"
 
@@ -117,14 +86,14 @@ usage: |-
 
       visibility_config = {
         cloudwatch_metrics_enabled = false
-        metric_name                = "rule-90"
+        metric_name                = "GeoAllowlistRule90"
         sampled_requests_enabled   = false
       }
     },
 
-    ## geo_match_statement_rules 60
+    # ## geo_match_statement_rules 60
     {
-      name     = "geo-match-statement-rule-60"
+      name     = "GeoMatchRule60"
       priority = "60"
       action   = "count"
 
@@ -134,12 +103,12 @@ usage: |-
 
       visibility_config = {
         cloudwatch_metrics_enabled = false
-        metric_name                = "rule-60"
+        metric_name                = "GeoMatchRule60"
         sampled_requests_enabled   = false
       }
     },
 
-    # managed_rule_group_statement_rules 1
+    # # managed_rule_group_statement_rules 1-7
     {
       name            = "AWS-AWSManagedRulesAdminProtectionRuleSet"
       priority        = "1"
@@ -201,10 +170,61 @@ usage: |-
         metric_name                = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
       }
     },
-
-    #rate_based_statement_rules 40
     {
-      name     = "rate-based-statement-rule-40"
+      name            = "AWS-AWSManagedRulesSQLiRuleSet",
+      priority        = 5
+      override_action = "none"
+      excluded_rules  = []
+
+      managed_rule_group_statement = {
+        name        = "AWSManagedRulesSQLiRuleSet"
+        vendor_name = "AWS"
+      }
+
+      visibility_config = {
+        cloudwatch_metrics_enabled = true
+        sampled_requests_enabled   = true
+        metric_name                = "AWSManagedRulesSQLiRuleSet"
+      }
+    },
+    {
+      name            = "AWS-AWSManagedRulesPHPRuleSet",
+      priority        = 6
+      override_action = "none"
+      excluded_rules  = []
+
+      managed_rule_group_statement = {
+        name        = "AWSManagedRulesPHPRuleSet"
+        vendor_name = "AWS"
+      }
+
+      visibility_config = {
+        cloudwatch_metrics_enabled = true
+        sampled_requests_enabled   = true
+        metric_name                = "AWSManagedRulesPHPRuleSet"
+      }
+    },
+    {
+      name            = "AWS-AWSManagedRulesAnonymousIpList",
+      priority        = 7
+      override_action = "none"
+      excluded_rules  = []
+
+      managed_rule_group_statement = {
+        name        = "AWSManagedRulesAnonymousIpList"
+        vendor_name = "AWS"
+      }
+
+      visibility_config = {
+        cloudwatch_metrics_enabled = true
+        sampled_requests_enabled   = true
+        metric_name                = "AWSManagedRulesAnonymousIpList"
+      }
+    },
+
+    # #rate_based_statement_rules 40
+    {
+      name     = "RateBasedRule40"
       priority = "40"
       action   = "block"
 
@@ -216,14 +236,14 @@ usage: |-
 
       visibility_config = {
         cloudwatch_metrics_enabled = false
-        metric_name                = "rule-40"
+        metric_name                = "RateBasedRule40"
         sampled_requests_enabled   = false
       }
     },
 
-    #regex_match_statement_rules 100
+    # #regex_match_statement_rules 100
     {
-      name     = "regex-match-statement-rule-100"
+      name     = "RegexMatchRule100"
       priority = "100"
       action   = "block"
 
@@ -243,14 +263,14 @@ usage: |-
 
       visibility_config = {
         cloudwatch_metrics_enabled = false
-        metric_name                = "rule-100"
+        metric_name                = "RegexMatchRule100"
         sampled_requests_enabled   = false
       }
     },
 
-    #size_constraint_statement_rules 50
+    # #size_constraint_statement_rules 50
     {
-      name     = "size-constraint-rule-50"
+      name     = "SizeConstraintRule50"
       priority = "50"
       action   = "block"
 
@@ -268,14 +288,14 @@ usage: |-
 
       visibility_config = {
         cloudwatch_metrics_enabled = false
-        metric_name                = "rule-50"
+        metric_name                = "SizeConstraintRule50"
         sampled_requests_enabled   = false
       }
     },
 
-    #sqli_match_statement_rules 70
+    # #sqli_match_statement_rules 70
     {
-      name     = "sqli-match-statement-rule-70"
+      name     = "SqliMatchRule70"
       priority = "70"
       action   = "block"
 
@@ -300,14 +320,14 @@ usage: |-
 
       visibility_config = {
         cloudwatch_metrics_enabled = false
-        metric_name                = "rule-70"
+        metric_name                = "SqliMatchRule70"
         sampled_requests_enabled   = false
       }
     },
 
-    #xss_match_statement 80
+    # #xss_match_statement 80
     {
-      name     = "xsss-match-statement-rule-80"
+      name     = "XsssMatchRule80"
       priority = "80"
       action   = "block"
 
@@ -331,7 +351,7 @@ usage: |-
 
       visibility_config = {
         cloudwatch_metrics_enabled = false
-        metric_name                = "rule-80"
+        metric_name                = "XsssMatchRule80"
         sampled_requests_enabled   = false
       }
     },
@@ -339,7 +359,7 @@ usage: |-
 
   #logs
 
-  create_logging_configuration = true
+  create_logging_configuration = false
   redacted_fields = [
     {
       single_header = {
@@ -377,5 +397,4 @@ usage: |-
       }
     ]
   }
-  }
-  ```
+}

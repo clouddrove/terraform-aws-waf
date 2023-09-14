@@ -1,7 +1,7 @@
 # Module      : Iam Role
 # Description : Terraform module to create Iam Role resource on AWS.
 output "arn" {
-  value       = join("", aws_wafv2_ip_set.main.*.arn)
+  value       = join("", aws_wafv2_ip_set.main[*].arn)
   description = "The Amazon Resource Name (ARN) specifying the role."
 }
 
@@ -11,11 +11,11 @@ output "tags" {
 }
 
 output "id" {
-  value       = join("", aws_wafv2_ip_set.main.*.name)
+  value       = join("", aws_wafv2_ip_set.main[*].name)
   description = "Name of specifying the role."
 }
 
 output "ip_set_arn" {
-  value       = join("", aws_wafv2_ip_set.main.*.arn)
+  value       = join("", aws_wafv2_ip_set.main[*].arn)
   description = "The ARN of Ip_set"
 }

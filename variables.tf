@@ -21,7 +21,7 @@ variable "repository" {
 
 variable "label_order" {
   type        = list(any)
-  default     = []
+  default     = ["name", "environment"]
   description = "Label order, e.g. `name`,`application`."
 }
 
@@ -31,18 +31,11 @@ variable "managedby" {
   description = "ManagedBy, eg 'CloudDrove'"
 }
 
-variable "attributes" {
-  type        = list(any)
-  default     = []
-  description = "Additional attributes (e.g. `1`)."
+variable "enable" {
+  type        = bool
+  default     = true
+  description = "Flag to control the vpc creation."
 }
-
-variable "tags" {
-  type        = map(any)
-  default     = {}
-  description = "Additional tags (e.g. map(`BusinessUnit`,`XYZ`)."
-}
-
 
 variable "waf_enabled" {
   type        = bool
@@ -96,11 +89,6 @@ variable "ip_addresses" {
   description = "(Required) Contains an array of strings that specify one or more IP addresses or blocks of IP addresses in Classless Inter-Domain Routing (CIDR) notation. AWS WAF supports all address ranges for IP versions IPv4 and IPv6."
 }
 
-variable "block_sensitive_paths" {
-  type    = bool
-  default = null
-}
-
 variable "rules" {
   description = "List of WAF rules."
   type        = any
@@ -137,4 +125,22 @@ variable "logging_filter" {
   type        = any
   default     = {}
   description = "A configuration block that specifies which web requests are kept in the logs and which are dropped. You can filter on the rule action and on the web request labels that were applied by matching rules during web ACL evaluation."
+}
+
+variable "kms_key_deletion_window" {
+  type        = number
+  default     = 10
+  description = "KMS Key deletion window in days."
+}
+
+variable "enable_key_rotation" {
+  type        = bool
+  default     = true
+  description = "Specifies whether key rotation is enabled. Defaults to true(security best practice)"
+}
+
+variable "s3_sse_algorithm" {
+  type        = string
+  default     = "aws:kms"
+  description = "Server-side encryption algorithm to use. Valid values are AES256 and aws:kms"
 }
