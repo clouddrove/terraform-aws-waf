@@ -19,7 +19,7 @@ module "waf" {
   }
 
   rules = [
-    {
+     {
       name            = "AWS-AWSManagedRulesAdminProtectionRuleSet"
       priority        = "1"
       override_action = "none"
@@ -27,7 +27,6 @@ module "waf" {
       managed_rule_group_statement = {
         name = "AWSManagedRulesAdminProtectionRuleSet"
       }
-
 
       visibility_config = {
         cloudwatch_metrics_enabled = true
@@ -43,7 +42,6 @@ module "waf" {
       managed_rule_group_statement = {
         name = "AWSManagedRulesAmazonIpReputationList"
       }
-
 
       visibility_config = {
         cloudwatch_metrics_enabled = true
@@ -80,6 +78,57 @@ module "waf" {
         cloudwatch_metrics_enabled = true
         sampled_requests_enabled   = true
         metric_name                = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
+      }
+    },
+    {
+      name            = "AWS-AWSManagedRulesSQLiRuleSet",
+      priority        = 5
+      override_action = "none"
+      excluded_rules  = []
+
+      managed_rule_group_statement = {
+        name        = "AWSManagedRulesSQLiRuleSet"
+        vendor_name = "AWS"
+      }
+
+      visibility_config = {
+        cloudwatch_metrics_enabled = true
+        sampled_requests_enabled   = true
+        metric_name                = "AWSManagedRulesSQLiRuleSet"
+      }
+    },
+    {
+      name            = "AWS-AWSManagedRulesPHPRuleSet",
+      priority        = 6
+      override_action = "none"
+      excluded_rules  = []
+
+      managed_rule_group_statement = {
+        name        = "AWSManagedRulesPHPRuleSet"
+        vendor_name = "AWS"
+      }
+
+      visibility_config = {
+        cloudwatch_metrics_enabled = true
+        sampled_requests_enabled   = true
+        metric_name                = "AWSManagedRulesPHPRuleSet"
+      }
+    },
+    {
+      name            = "AWS-AWSManagedRulesAnonymousIpList",
+      priority        = 7
+      override_action = "none"
+      excluded_rules  = []
+
+      managed_rule_group_statement = {
+        name        = "AWSManagedRulesAnonymousIpList"
+        vendor_name = "AWS"
+      }
+
+      visibility_config = {
+        cloudwatch_metrics_enabled = true
+        sampled_requests_enabled   = true
+        metric_name                = "AWSManagedRulesAnonymousIpList"
       }
     },
 

@@ -8,7 +8,7 @@ locals {
 
 }
 module "ip_set" {
-  source       = "../../" #"clouddrove/labels/aws"
+  source       =  "clouddrove/labels/aws"
   version      = "2.0.0"
   name         = local.name
   environment  = local.environment
@@ -16,7 +16,7 @@ module "ip_set" {
 }
 
 module "waf" {
-  source               = "../../" #"clouddrove/labels/aws"
+  source               = "clouddrove/labels/aws"
   version              = "2.0.0"
   name                 = local.name
   environment          = local.environment
@@ -50,7 +50,7 @@ module "waf" {
       }
     },
 
-    ## Byte match statement rules. 30
+    # ## Byte match statement rules. 30
     {
       name     = "ByteMatchRule30"
       priority = "30"
@@ -69,12 +69,12 @@ module "waf" {
 
       visibility_config = {
         cloudwatch_metrics_enabled = false
-        metric_name                = "rule-30"
+        metric_name                = "ByteMatchRule30"
         sampled_requests_enabled   = false
       }
     },
 
-    ## geo_allowlist_statement_rules 90
+    # ## geo_allowlist_statement_rules 90
     {
       name     = "GeoAllowlistRule90"
       priority = "90"
@@ -88,12 +88,12 @@ module "waf" {
 
       visibility_config = {
         cloudwatch_metrics_enabled = false
-        metric_name                = "rule-90"
+        metric_name                = "GeoAllowlistRule90"
         sampled_requests_enabled   = false
       }
     },
 
-    ## geo_match_statement_rules 60
+    # ## geo_match_statement_rules 60
     {
       name     = "GeoMatchRule60"
       priority = "60"
@@ -105,12 +105,12 @@ module "waf" {
 
       visibility_config = {
         cloudwatch_metrics_enabled = false
-        metric_name                = "rule-60"
+        metric_name                = "GeoMatchRule60"
         sampled_requests_enabled   = false
       }
     },
 
-    # managed_rule_group_statement_rules 1
+    # # managed_rule_group_statement_rules 1-7
     {
       name            = "AWS-AWSManagedRulesAdminProtectionRuleSet"
       priority        = "1"
@@ -172,8 +172,59 @@ module "waf" {
         metric_name                = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
       }
     },
+    {
+      name            = "AWS-AWSManagedRulesSQLiRuleSet",
+      priority        = 5
+      override_action = "none"
+      excluded_rules  = []
 
-    #rate_based_statement_rules 40
+      managed_rule_group_statement = {
+        name        = "AWSManagedRulesSQLiRuleSet"
+        vendor_name = "AWS"
+      }
+
+      visibility_config = {
+        cloudwatch_metrics_enabled = true
+        sampled_requests_enabled   = true
+        metric_name                = "AWSManagedRulesSQLiRuleSet"
+      }
+    },
+    {
+      name            = "AWS-AWSManagedRulesPHPRuleSet",
+      priority        = 6
+      override_action = "none"
+      excluded_rules  = []
+
+      managed_rule_group_statement = {
+        name        = "AWSManagedRulesPHPRuleSet"
+        vendor_name = "AWS"
+      }
+
+      visibility_config = {
+        cloudwatch_metrics_enabled = true
+        sampled_requests_enabled   = true
+        metric_name                = "AWSManagedRulesPHPRuleSet"
+      }
+    },
+    {
+      name            = "AWS-AWSManagedRulesAnonymousIpList",
+      priority        = 7
+      override_action = "none"
+      excluded_rules  = []
+
+      managed_rule_group_statement = {
+        name        = "AWSManagedRulesAnonymousIpList"
+        vendor_name = "AWS"
+      }
+
+      visibility_config = {
+        cloudwatch_metrics_enabled = true
+        sampled_requests_enabled   = true
+        metric_name                = "AWSManagedRulesAnonymousIpList"
+      }
+    },
+      
+    # #rate_based_statement_rules 40
     {
       name     = "RateBasedRule40"
       priority = "40"
@@ -187,12 +238,12 @@ module "waf" {
 
       visibility_config = {
         cloudwatch_metrics_enabled = false
-        metric_name                = "rule-40"
+        metric_name                = "RateBasedRule40"
         sampled_requests_enabled   = false
       }
     },
 
-    #regex_match_statement_rules 100
+    # #regex_match_statement_rules 100
     {
       name     = "RegexMatchRule100"
       priority = "100"
@@ -214,12 +265,12 @@ module "waf" {
 
       visibility_config = {
         cloudwatch_metrics_enabled = false
-        metric_name                = "rule-100"
+        metric_name                = "RegexMatchRule100"
         sampled_requests_enabled   = false
       }
     },
 
-    #size_constraint_statement_rules 50
+    # #size_constraint_statement_rules 50
     {
       name     = "SizeConstraintRule50"
       priority = "50"
@@ -239,12 +290,12 @@ module "waf" {
 
       visibility_config = {
         cloudwatch_metrics_enabled = false
-        metric_name                = "rule-50"
+        metric_name                = "SizeConstraintRule50"
         sampled_requests_enabled   = false
       }
     },
 
-    #sqli_match_statement_rules 70
+    # #sqli_match_statement_rules 70
     {
       name     = "SqliMatchRule70"
       priority = "70"
@@ -271,12 +322,12 @@ module "waf" {
 
       visibility_config = {
         cloudwatch_metrics_enabled = false
-        metric_name                = "rule-70"
+        metric_name                = "SqliMatchRule70"
         sampled_requests_enabled   = false
       }
     },
 
-    #xss_match_statement 80
+    # #xss_match_statement 80
     {
       name     = "XsssMatchRule80"
       priority = "80"
@@ -302,7 +353,7 @@ module "waf" {
 
       visibility_config = {
         cloudwatch_metrics_enabled = false
-        metric_name                = "rule-80"
+        metric_name                = "XsssMatchRule80"
         sampled_requests_enabled   = false
       }
     },
@@ -310,7 +361,7 @@ module "waf" {
 
   #logs
 
-  create_logging_configuration = true
+  create_logging_configuration = false
   redacted_fields = [
     {
       single_header = {
