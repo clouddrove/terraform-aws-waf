@@ -8,14 +8,14 @@ locals {
 
 }
 module "ip_set" {
-  source       =  "../../"
+  source       = "../../"
   name         = local.name
   environment  = local.environment
   ip_addresses = ["51.79.69.69/32"]
 }
 
 module "waf" {
-  source       =  "../../"
+  source               = "../../"
   name                 = local.name
   environment          = local.environment
   allow_default_action = false
@@ -221,7 +221,7 @@ module "waf" {
         metric_name                = "AWSManagedRulesAnonymousIpList"
       }
     },
-      
+
     # #rate_based_statement_rules 40
     {
       name     = "RateBasedRule40"

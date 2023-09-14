@@ -19,7 +19,7 @@ module "waf" {
   }
 
   rules = [
-     {
+    {
       name            = "AWS-AWSManagedRulesAdminProtectionRuleSet"
       priority        = "1"
       override_action = "none"
