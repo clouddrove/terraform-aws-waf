@@ -1325,10 +1325,13 @@ resource "aws_s3_bucket_versioning" "webacl_traffic_information" {
   count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
   bucket = join("", aws_s3_bucket.webacl_traffic_information[*].id)
+  mfa    = var.mfa
   versioning_configuration {
-    status = "Enabled"
+    status     = var.versioning_status
+    mfa_delete = var.mfa_delete
   }
 }
+
 resource "aws_s3_bucket_server_side_encryption_configuration" "webacl_traffic_information" {
   count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
@@ -1338,6 +1341,33 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "webacl_traffic_in
       sse_algorithm = "AES256"
     }
   }
+}
+
+resource "aws_s3_bucket_policy" "block-http" {
+  count  = var.enable && var.waf_enabled && var.create_logging_configuration && var.only_https_traffic ? 1 : 0
+  bucket = aws_s3_bucket.webacl_traffic_information[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Id      = "Blockhttp"
+    Statement = [
+      {
+        "Sid" : "AllowSSLRequestsOnly",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.webacl_traffic_information[0].arn,
+          "${aws_s3_bucket.webacl_traffic_information[0].arn}/*",
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
+    ]
+  })
 }
 
 # AWS Glue Catalog Database. This resource is needed by Amazon Kinesis Firehose as data format conversion configuration, for transforming from JSON to Parquet.

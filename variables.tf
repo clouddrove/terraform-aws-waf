@@ -144,3 +144,27 @@ variable "s3_sse_algorithm" {
   default     = "aws:kms"
   description = "Server-side encryption algorithm to use. Valid values are AES256 and aws:kms"
 }
+
+variable "only_https_traffic" {
+  type        = bool
+  default     = true
+  description = "This veriables use for only https traffic."
+}
+
+variable "mfa_delete" {
+  type        = string
+  default     = "Disabled"
+  description = "Specifies whether MFA delete is enabled in the bucket versioning configuration. Valid values: Enabled or Disabled."
+}
+
+variable "mfa" {
+  type        = string
+  default     = null
+  description = "Optional, Required if versioning_configuration mfa_delete is enabled) Concatenation of the authentication device's serial number, a space, and the value that is displayed on your authentication device."
+}
+
+variable "versioning_status" {
+  type        = string
+  default     = "Enabled"
+  description = "Required if versioning_configuration mfa_delete is enabled) Concatenation of the authentication device's serial number, a space, and the value that is displayed on your authentication device."
+}
