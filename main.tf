@@ -1196,10 +1196,10 @@ resource "aws_wafv2_web_acl" "main" {
 # WAFv2 web acl association with ALB
 #####
 resource "aws_wafv2_web_acl_association" "main" {
-  count = var.enable && var.waf_enabled && var.web_acl_association && length(var.resource_arn_list) > 0 ? 1 : 0
+  count = var.waf_enabled && var.web_acl_association && length(var.resource_arn_list) == 0 ? 1 : 0
 
   resource_arn = var.resource_arn
-  web_acl_arn  = join("", aws_wafv2_web_acl.main[*].arn)
+  web_acl_arn  = join("", aws_wafv2_web_acl.main.*.arn)
 
   depends_on = [aws_wafv2_web_acl.main]
 }
