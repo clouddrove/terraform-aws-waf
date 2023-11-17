@@ -79,6 +79,13 @@ variable "firehose_buffer_interval" {
   default     = 900
   description = "Buffer incoming data for the specified period of time, in seconds, before delivering it to the destination. Valid value is between 60-900. Smaller value makes the logs delivered faster. Bigger value increase the chance to make the file size bigger, which are more efficient to query."
 }
+
+variable "description" {
+  type        = string
+  default     = "WAFv2 ACL"
+  description = "Description for web acl"
+}
+
 variable "waf_scop" {
   type    = string
   default = "REGIONAL"
@@ -167,4 +174,29 @@ variable "versioning_status" {
   type        = string
   default     = "Enabled"
   description = "Required if versioning_configuration mfa_delete is enabled) Concatenation of the authentication device's serial number, a space, and the value that is displayed on your authentication device."
+}
+
+#logs : CloudWatch Logs log group
+variable "enable_cloudwatch_logs" {
+  type        = bool
+  default     = false
+  description = "Enable WAF logging destination as CloudWatch Logs log group"
+}
+
+variable "cloudwatch_logs_retention_in_days" {
+  type        = number
+  default     = 7
+  description = "Retention period of CloudWatch Logs log group"
+}
+
+variable "kms_key_arn" {
+  type        = string
+  default     = null
+  description = "(Optional) KMS key ARN to encrypt CloudWatch Logs log group"
+}
+
+variable "cloudwatch_logs_policy_document" {
+  type        = string
+  default     = ""
+  description = "(Optional) Custome IAM Policy for CloudWatch Logs log group"
 }
