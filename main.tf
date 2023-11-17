@@ -30,7 +30,7 @@ resource "aws_wafv2_ip_set" "main" {
 resource "aws_wafv2_web_acl" "main" {
   count       = var.enable && var.waf_enabled ? 1 : 0
   name        = module.labels.id
-  description = "WAFv2 ACL for"
+  description = var.description
   scope       = var.waf_scop
 
   default_action {
@@ -1725,6 +1725,57 @@ resource "aws_wafv2_web_acl_logging_configuration" "main" {
           }
         }
       }
+    }
+  }
+}
+
+#####
+# WAFv2 web acl logging configuration with CloudWatch Logs log group
+#####
+resource "aws_cloudwatch_log_group" "cloudwatch_logs" {
+  count = var.enable && var.waf_enabled && var.enable_cloudwatch_logs ? 1 : 0
+
+  name              = "aws-waf-logs-${module.labels.id}"
+  retention_in_days = var.cloudwatch_logs_retention_in_days
+  kms_key_id        = var.kms_key_arn
+  tags              = module.labels.tags
+}
+
+resource "aws_wafv2_web_acl_logging_configuration" "cloudwatch_logs" {
+  count = var.enable && var.waf_enabled && var.enable_cloudwatch_logs ? 1 : 0
+
+  log_destination_configs = [join("", aws_cloudwatch_log_group.cloudwatch_logs[*].arn)]
+  resource_arn            = join("", aws_wafv2_web_acl.main[*].arn)
+}
+
+resource "aws_cloudwatch_log_resource_policy" "cloudwatch_logs" {
+  count = var.enable && var.waf_enabled && var.enable_cloudwatch_logs ? 1 : 0
+
+  policy_document = var.cloudwatch_logs_policy_document != "" ? var.cloudwatch_logs_policy_document : join("", data.aws_iam_policy_document.cloudwatch_logs[*].json)
+  policy_name     = "${module.labels.id}-cloudwatch-logs-policy"
+}
+
+data "aws_iam_policy_document" "cloudwatch_logs" {
+  count = var.enable && var.waf_enabled && var.enable_cloudwatch_logs ? 1 : 0
+
+  version = "2012-10-17"
+  statement {
+    effect = "Allow"
+    principals {
+      identifiers = ["delivery.logs.amazonaws.com"]
+      type        = "Service"
+    }
+    actions   = ["logs:CreateLogStream", "logs:PutLogEvents"]
+    resources = ["${join("", aws_cloudwatch_log_group.cloudwatch_logs[*].arn)}:*"]
+    condition {
+      test     = "ArnLike"
+      values   = ["arn:aws:logs:${data.aws_region.this.name}:${data.aws_caller_identity.this.account_id}:*"]
+      variable = "aws:SourceArn"
+    }
+    condition {
+      test     = "StringEquals"
+      values   = [tostring(data.aws_caller_identity.this.account_id)]
+      variable = "aws:SourceAccount"
     }
   }
 }
