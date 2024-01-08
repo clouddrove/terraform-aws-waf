@@ -8,5 +8,5 @@ jobs:
     secrets:
       GITHUB: ${{ secrets.GITHUB }}
     with:
-      tfcheck: 'xss_match_statement / Get min/max versions'
+      tfcheck: 'byte_match_statement_rules / Check code format'
 ...
