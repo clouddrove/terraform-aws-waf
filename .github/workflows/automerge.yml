@@ -42,6 +42,7 @@ jobs:
     name: Auto Approve PRs by Dependabot
     needs: static-checks
     runs-on: ubuntu-latest
+    uses: hmarr/auto-approve-action@v4.0.0
     if: github.actor == 'dependabot[bot]'
     steps:
       - name: Approve PR via GitHub Bot
@@ -68,6 +69,6 @@ jobs:
           MERGE_FILTER_AUTHOR: 'dependabot[bot]'
           MERGE_METHOD: "merge"
           MERGE_DELETE_BRANCH: "true"
-          MERGE_LABELS: "dependencies, github_actions, automerge"
+          MERGE_LABELS: "dependencies"
           MERGE_REQUIRED_APPROVALS: ""
 ...
