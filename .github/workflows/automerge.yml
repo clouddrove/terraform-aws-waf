@@ -20,7 +20,7 @@ jobs:
     strategy:
       matrix:
         tf-checks: ["tf-lint / tflint", "tfsec / tfsec sarif report", "${{ inputs.tfcheck }}"]
-    if: github.actor == 'dependabot[bot]'
+    if: github.actor == 'theprashantyadav'
     steps:
       - name: Wait for 2 Minutes
         run: sleep 120s
@@ -43,7 +43,7 @@ jobs:
     needs: static-checks
     runs-on: ubuntu-latest
     uses: hmarr/auto-approve-action@v4.0.0
-    if: github.actor == 'dependabot[bot]'
+    if: github.actor == 'theprashantyadav'
     steps:
       - name: Approve PR via GitHub Bot
         run: gh pr review --approve "$PR_URL"
@@ -66,7 +66,7 @@ jobs:
         if: github.event_name == 'pull_request' && github.event.pull_request.draft == false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB }}
-          MERGE_FILTER_AUTHOR: 'dependabot[bot]'
+          MERGE_FILTER_AUTHOR: 'theprashantyadav'
           MERGE_METHOD: "merge"
           MERGE_DELETE_BRANCH: "true"
           MERGE_LABELS: "dependencies"
