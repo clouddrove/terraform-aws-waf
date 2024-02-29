@@ -42,7 +42,6 @@ jobs:
     name: Auto Approve PRs by Dependabot
     needs: static-checks
     runs-on: ubuntu-latest
-    uses: hmarr/auto-approve-action@v4.0.0
     if: github.actor == 'theprashantyadav'
     steps:
       - name: Approve PR via GitHub Bot
