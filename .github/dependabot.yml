@@ -30,7 +30,7 @@ updates:
     open-pull-requests-limit: 3
 
   - package-ecosystem: "terraform" # See documentation for possible values
-    directory: "/_example/complete" # Location of package manifests
+    directory: "/examples/complete" # Location of package manifests
     schedule:
       interval: "weekly"
     # Add assignees
@@ -43,7 +43,7 @@ updates:
     open-pull-requests-limit: 3
 
   - package-ecosystem: "terraform" # See documentation for possible values
-    directory: "/_example/byte_match_statement_rules" # Location of package manifests
+    directory: "/examples/byte_match_statement_rules" # Location of package manifests
     schedule:
       interval: "weekly"
     # Add assignees
@@ -56,7 +56,7 @@ updates:
     open-pull-requests-limit: 3
   
   - package-ecosystem: "terraform" # See documentation for possible values
-    directory: "/_example/geo_allowlist_statement_rules" # Location of package manifests
+    directory: "/examples/geo_allowlist_statement_rules" # Location of package manifests
     schedule:
       interval: "weekly"
     # Add assignees
@@ -69,7 +69,7 @@ updates:
     open-pull-requests-limit: 3
   
   - package-ecosystem: "terraform" # See documentation for possible values
-    directory: "/_example/geo_match_statement_rules" # Location of package manifests
+    directory: "/examples/geo_match_statement_rules" # Location of package manifests
     schedule:
       interval: "weekly"
     # Add assignees
@@ -82,7 +82,7 @@ updates:
     open-pull-requests-limit: 3
   
   - package-ecosystem: "terraform" # See documentation for possible values
-    directory: "/_example/ip_set_reference_statement_rules" # Location of package manifests
+    directory: "/examples/ip_set_reference_statement_rules" # Location of package manifests
     schedule:
       interval: "weekly"
     # Add assignees
@@ -95,7 +95,7 @@ updates:
     open-pull-requests-limit: 3
   
   - package-ecosystem: "terraform" # See documentation for possible values
-    directory: "/_example/managed_rule _group_statement" # Location of package manifests
+    directory: "/examples/managed_rule _group_statement" # Location of package manifests
     schedule:
       interval: "weekly"
     # Add assignees
@@ -108,7 +108,7 @@ updates:
     open-pull-requests-limit: 3
   
   - package-ecosystem: "terraform" # See documentation for possible values
-    directory: "/_example/rate_based_statement_rules" # Location of package manifests
+    directory: "/examples/rate_based_statement_rules" # Location of package manifests
     schedule:
       interval: "weekly"
     # Add assignees
@@ -121,7 +121,7 @@ updates:
     open-pull-requests-limit: 3
   
   - package-ecosystem: "terraform" # See documentation for possible values
-    directory: "/_example/regex_match_statement_rules" # Location of package manifests
+    directory: "/examples/regex_match_statement_rules" # Location of package manifests
     schedule:
       interval: "weekly"
     # Add assignees
@@ -134,7 +134,7 @@ updates:
     open-pull-requests-limit: 3
   
   - package-ecosystem: "terraform" # See documentation for possible values
-    directory: "/_example/size_constraint_statement_rules" # Location of package manifests
+    directory: "/examples/size_constraint_statement_rules" # Location of package manifests
     schedule:
       interval: "weekly"
     # Add assignees
@@ -147,7 +147,7 @@ updates:
     open-pull-requests-limit: 3
   
   - package-ecosystem: "terraform" # See documentation for possible values
-    directory: "/_example/sqli_match_statement_rules" # Location of package manifests
+    directory: "/examples/sqli_match_statement_rules" # Location of package manifests
     schedule:
       interval: "weekly"
     # Add assignees
@@ -160,7 +160,7 @@ updates:
     open-pull-requests-limit: 3
   
   - package-ecosystem: "terraform" # See documentation for possible values
-    directory: "/_example/xss_match_statement" # Location of package manifests
+    directory: "/examples/xss_match_statement" # Location of package manifests
     schedule:
       interval: "weekly"
     # Add assignees
