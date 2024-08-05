@@ -6,46 +6,46 @@ on:
   workflow_dispatch:
 jobs:
   complete:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@1.2.7
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
       working_directory: './examples/complete/'
   byte_match_statement_rules:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@1.2.7
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
       working_directory: './examples/byte_match_statement_rules/'
   geo_allowlist_statement_rules:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@1.2.7
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
       working_directory: './examples/geo_allowlist_statement_rules/'
   geo_match_statement_rules:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@1.2.7
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
       working_directory: './examples/geo_match_statement_rules/'
   ip_set_reference_statement_rules:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@1.2.7
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
       working_directory: './examples/ip_set_reference_statement_rules/'
   managed_rule_group_statement_rules:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@1.2.7
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
       working_directory: './examples/managed_rule_group_statement_rules/'
   rate_based_statement_rules:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@1.2.7
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
       working_directory: './examples/rate_based_statement_rules/'
   regex_match_statement_rules:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@1.2.7
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
       working_directory: './examples/regex_match_statement_rules/'
   size_constraint_statement_rules:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@1.2.7
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
       working_directory: './examples/size_constraint_statement_rules/'
   sqli_match_statement_rules:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@1.2.7
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
       working_directory: './examples/sqli_match_statement_rules/'
   xss_match_statement:
-    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@1.2.7
+    uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@master
     with:
       working_directory: './examples/xss_match_statement/'
