@@ -118,7 +118,7 @@ variable "allow_default_action" {
 #logs
 variable "create_logging_configuration" {
   type        = bool
-  default     = true
+  default     = false
   description = "Whether to create logging configuration in order start logging from a WAFv2 Web ACL to Amazon Kinesis Data Firehose."
 }
 
