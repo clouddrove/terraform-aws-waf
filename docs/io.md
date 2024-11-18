@@ -5,7 +5,7 @@
 | allow\_default\_action | Set to `true` for WAF to allow requests by default. Set to `false` for WAF to block requests by default. | `bool` | `true` | no |
 | cloudwatch\_logs\_policy\_document | (Optional) Custome IAM Policy for CloudWatch Logs log group | `string` | `""` | no |
 | cloudwatch\_logs\_retention\_in\_days | Retention period of CloudWatch Logs log group | `number` | `7` | no |
-| create\_logging\_configuration | Whether to create logging configuration in order start logging from a WAFv2 Web ACL to Amazon Kinesis Data Firehose. | `bool` | `true` | no |
+| create\_logging\_configuration | Whether to create logging configuration in order start logging from a WAFv2 Web ACL to Amazon Kinesis Data Firehose. | `bool` | `false` | no |
 | description | Description for web acl | `string` | `"WAFv2 ACL"` | no |
 | enable | Flag to control the vpc creation. | `bool` | `true` | no |
 | enable\_cloudwatch\_logs | Enable WAF logging destination as CloudWatch Logs log group | `bool` | `false` | no |
