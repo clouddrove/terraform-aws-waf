@@ -1224,7 +1224,7 @@ data "aws_region" "this" {}
 #
 
 ##-----------------------------------------------------------------------------
-## Below resource will create kms key. This key will used for encryption of flow logs stored in S3 bucket or cloudwatch log group. 
+## Below resource will create kms key. This key will used for encryption of flow logs stored in S3 bucket or cloudwatch log group.
 ##-----------------------------------------------------------------------------
 
 resource "aws_kms_key" "kms" {
@@ -1240,8 +1240,8 @@ resource "aws_kms_alias" "kms-alias" {
 }
 
 ##-----------------------------------------------------------------------------
-## Below resource will attach policy to above created kms key. The above created key require policy to be attached so that cloudwatch log group can access it. 
-## It will be only created when vpc flow logs are stored in cloudwatch log group. 
+## Below resource will attach policy to above created kms key. The above created key require policy to be attached so that cloudwatch log group can access it.
+## It will be only created when vpc flow logs are stored in cloudwatch log group.
 ##-----------------------------------------------------------------------------
 resource "aws_kms_key_policy" "example" {
   count  = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
