@@ -1527,7 +1527,7 @@ resource "aws_iam_role" "firehose" {
 
 # Policy document that will be attached to the S3 Bucket, to make the bucket accessible by the Firehose.
 data "aws_iam_policy_document" "allow_s3_actions" {
-    count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
+  count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
   statement {
     effect = "Allow"
 
