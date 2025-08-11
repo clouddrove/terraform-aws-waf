@@ -1196,7 +1196,7 @@ resource "aws_wafv2_web_acl" "main" {
 # WAFv2 web acl association with ALB
 #####
 resource "aws_wafv2_web_acl_association" "main" {
-  count = var.waf_enabled && var.web_acl_association && length(var.resource_arn_list) == 0 ? 1 : 0
+  count = var.enable && var.waf_enabled && var.web_acl_association && length(var.resource_arn_list) == 0 ? 1 : 0
 
   resource_arn = var.resource_arn
   web_acl_arn  = join("", aws_wafv2_web_acl.main[*].arn)
@@ -1493,6 +1493,7 @@ resource "aws_cloudwatch_log_stream" "firehose_error_logs" {
 
 # Policy document that will allow the Firehose to assume an IAM Role.
 data "aws_iam_policy_document" "firehose_assume_role_policy" {
+  count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
   statement {
     actions = [
       "sts:AssumeRole",
@@ -1517,7 +1518,7 @@ resource "aws_iam_role" "firehose" {
   path        = "/service-role/firehose/"
   description = format("Service Role for %s-WebACL Firehose", module.labels.id)
 
-  assume_role_policy    = data.aws_iam_policy_document.firehose_assume_role_policy.json
+  assume_role_policy    = data.aws_iam_policy_document.firehose_assume_role_policy[0].json
   force_detach_policies = "false"
   max_session_duration  = "43200"
 
@@ -1526,6 +1527,7 @@ resource "aws_iam_role" "firehose" {
 
 # Policy document that will be attached to the S3 Bucket, to make the bucket accessible by the Firehose.
 data "aws_iam_policy_document" "allow_s3_actions" {
+  count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
   statement {
     effect = "Allow"
 
@@ -1558,11 +1560,12 @@ resource "aws_s3_bucket_policy" "webacl_traffic_information_lb" {
   count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
 
   bucket = join("", aws_s3_bucket.webacl_traffic_information[*].id)
-  policy = data.aws_iam_policy_document.allow_s3_actions.json
+  policy = data.aws_iam_policy_document.allow_s3_actions[*].json
 }
 
 # Policy document that will be attached to the IAM Role, to make the role able to put logs to Cloudwatch.
 data "aws_iam_policy_document" "allow_put_log_events" {
+  count = var.enable && var.waf_enabled && var.enable_cloudwatch_logs ? 1 : 0
   statement {
     sid = "AllowWritingToLogStreams"
 
@@ -1585,11 +1588,12 @@ resource "aws_iam_role_policy" "allow_put_log_events" {
   name = "AllowWritingToLogStreams"
   role = join("", aws_iam_role.firehose[*].name)
 
-  policy = data.aws_iam_policy_document.allow_put_log_events.json
+  policy = data.aws_iam_policy_document.allow_put_log_events[0].json
 }
 
 # Policy document that will be attached to the IAM Role, to make the role able to get Glue Table Versions.
 data "aws_iam_policy_document" "allow_glue_get_table_versions" {
+  count = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
   statement {
     sid = "AllowGettingGlueTableVersions"
 
@@ -1615,7 +1619,7 @@ resource "aws_iam_role_policy" "allow_glue_get_table_versions" {
   name = format("AllowGettingGlueTableVersions-%s", module.labels.id)
   role = join("", aws_iam_role.firehose[*].name)
 
-  policy = data.aws_iam_policy_document.allow_glue_get_table_versions.json
+  policy = data.aws_iam_policy_document.allow_glue_get_table_versions[0].json
 }
 
 # Creating the Firehose.
