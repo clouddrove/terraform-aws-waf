@@ -1260,7 +1260,7 @@ resource "aws_kms_key_policy" "example" {
       },
       {
         "Effect" : "Allow",
-        "Principal" : { "Service" : "logs.${data.aws_region.this.name}.amazonaws.com" },
+        "Principal" : { "Service" : "logs.${data.aws_region.this.region}.amazonaws.com" },
         "Action" : [
           "kms:Encrypt*",
           "kms:Decrypt*",
@@ -1604,10 +1604,10 @@ data "aws_iam_policy_document" "allow_glue_get_table_versions" {
     effect = "Allow"
 
     resources = [
-      "arn:aws:glue:${data.aws_region.this.name}:${data.aws_caller_identity.this.account_id}:table/${join("", aws_glue_catalog_database.database[*].name)}/logs",
-      "arn:aws:glue:${data.aws_region.this.name}:${data.aws_caller_identity.this.account_id}:table/${join("", aws_glue_catalog_database.database[*].name)}/${join("", aws_glue_catalog_table.table[*].name)}",
-      "arn:aws:glue:${data.aws_region.this.name}:${data.aws_caller_identity.this.account_id}:database/${join("", aws_glue_catalog_database.database[*].name)}",
-      "arn:aws:glue:${data.aws_region.this.name}:${data.aws_caller_identity.this.account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.this.region}:${data.aws_caller_identity.this.account_id}:table/${join("", aws_glue_catalog_database.database[*].name)}/logs",
+      "arn:aws:glue:${data.aws_region.this.region}:${data.aws_caller_identity.this.account_id}:table/${join("", aws_glue_catalog_database.database[*].name)}/${join("", aws_glue_catalog_table.table[*].name)}",
+      "arn:aws:glue:${data.aws_region.this.region}:${data.aws_caller_identity.this.account_id}:database/${join("", aws_glue_catalog_database.database[*].name)}",
+      "arn:aws:glue:${data.aws_region.this.region}:${data.aws_caller_identity.this.account_id}:catalog",
     ]
   }
 }
@@ -1668,7 +1668,7 @@ resource "aws_kinesis_firehose_delivery_stream" "waf" {
         role_arn      = join("", aws_iam_role.firehose[*].arn)
         database_name = join("", aws_glue_catalog_table.table[*].database_name)
         table_name    = join("", aws_glue_catalog_table.table[*].name)
-        region        = data.aws_region.this.name
+        region        = data.aws_region.this.region
       }
     }
   }
@@ -1773,7 +1773,7 @@ data "aws_iam_policy_document" "cloudwatch_logs" {
     resources = ["${join("", aws_cloudwatch_log_group.cloudwatch_logs[*].arn)}:*"]
     condition {
       test     = "ArnLike"
-      values   = ["arn:aws:logs:${data.aws_region.this.name}:${data.aws_caller_identity.this.account_id}:*"]
+      values   = ["arn:aws:logs:${data.aws_region.this.region}:${data.aws_caller_identity.this.account_id}:*"]
       variable = "aws:SourceArn"
     }
     condition {
