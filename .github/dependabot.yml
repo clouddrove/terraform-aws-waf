@@ -54,7 +54,7 @@ updates:
       - "approvers"
     # Allow up to 3 open pull requests for pip dependencies
     open-pull-requests-limit: 3
-  
+
   - package-ecosystem: "terraform" # See documentation for possible values
     directory: "/examples/geo_allowlist_statement_rules" # Location of package manifests
     schedule:
@@ -67,7 +67,7 @@ updates:
       - "approvers"
     # Allow up to 3 open pull requests for pip dependencies
     open-pull-requests-limit: 3
-  
+
   - package-ecosystem: "terraform" # See documentation for possible values
     directory: "/examples/geo_match_statement_rules" # Location of package manifests
     schedule:
@@ -80,7 +80,7 @@ updates:
       - "approvers"
     # Allow up to 3 open pull requests for pip dependencies
     open-pull-requests-limit: 3
-  
+
   - package-ecosystem: "terraform" # See documentation for possible values
     directory: "/examples/ip_set_reference_statement_rules" # Location of package manifests
     schedule:
@@ -93,7 +93,7 @@ updates:
       - "approvers"
     # Allow up to 3 open pull requests for pip dependencies
     open-pull-requests-limit: 3
-  
+
   - package-ecosystem: "terraform" # See documentation for possible values
     directory: "/examples/managed_rule _group_statement" # Location of package manifests
     schedule:
@@ -106,7 +106,7 @@ updates:
       - "approvers"
     # Allow up to 3 open pull requests for pip dependencies
     open-pull-requests-limit: 3
-  
+
   - package-ecosystem: "terraform" # See documentation for possible values
     directory: "/examples/rate_based_statement_rules" # Location of package manifests
     schedule:
@@ -119,7 +119,7 @@ updates:
       - "approvers"
     # Allow up to 3 open pull requests for pip dependencies
     open-pull-requests-limit: 3
-  
+
   - package-ecosystem: "terraform" # See documentation for possible values
     directory: "/examples/regex_match_statement_rules" # Location of package manifests
     schedule:
@@ -132,7 +132,7 @@ updates:
       - "approvers"
     # Allow up to 3 open pull requests for pip dependencies
     open-pull-requests-limit: 3
-  
+
   - package-ecosystem: "terraform" # See documentation for possible values
     directory: "/examples/size_constraint_statement_rules" # Location of package manifests
     schedule:
@@ -145,7 +145,7 @@ updates:
       - "approvers"
     # Allow up to 3 open pull requests for pip dependencies
     open-pull-requests-limit: 3
-  
+
   - package-ecosystem: "terraform" # See documentation for possible values
     directory: "/examples/sqli_match_statement_rules" # Location of package manifests
     schedule:
@@ -158,7 +158,7 @@ updates:
       - "approvers"
     # Allow up to 3 open pull requests for pip dependencies
     open-pull-requests-limit: 3
-  
+
   - package-ecosystem: "terraform" # See documentation for possible values
     directory: "/examples/xss_match_statement" # Location of package manifests
     schedule:
