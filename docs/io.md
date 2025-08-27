@@ -43,3 +43,4 @@
 | id | Name of specifying the role. |
 | ip\_set\_arn | The ARN of Ip\_set |
 | tags | A mapping of tags to assign to the resource. |
+
