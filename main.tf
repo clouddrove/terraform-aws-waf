@@ -1069,8 +1069,8 @@ resource "aws_wafv2_web_acl" "main" {
                     positional_constraint = lookup(byte_match_statement.value, "positional_constraint")
                     search_string         = lookup(byte_match_statement.value, "search_string")
                     text_transformation {
-                      priority = lookup(byte_match_statement.value, "priority")
-                      type     = lookup(byte_match_statement.value, "type")
+                      priority = lookup(byte_match_statement.value.text_transformation, "priority")
+                      type     = lookup(byte_match_statement.value.text_transformation, "type")
                     }
                   }
                 }
@@ -1082,6 +1082,22 @@ resource "aws_wafv2_web_acl" "main" {
                     country_codes = lookup(geo_match_statement.value, "country_codes")
                   }
                 }
+
+                # AND NOT ip_set_statement
+                dynamic "not_statement" {
+                  for_each = length(lookup(statement.value, "not_statement", {})) == 0 ? [] : [lookup(statement.value, "not_statement", {})]
+                  content {
+                    statement {
+                      dynamic "ip_set_reference_statement" {
+                        for_each = length(lookup(not_statement.value, "ip_set_reference_statement", {})) == 0 ? [] : [lookup(not_statement.value, "ip_set_reference_statement", {})]
+                        content {
+                          arn = lookup(ip_set_reference_statement.value, "arn")
+                        }
+                      }
+                    }
+                  }
+                }
+
 
                 # AND ip_set_statement
                 dynamic "ip_set_reference_statement" {
