@@ -34,7 +34,7 @@ variable "label_order" {
 variable "managedby" {
   type        = string
   default     = "CloudDrove"
-  description = "ManagedBy, eg 'CloudDrove'"
+  description = "ManagedBy, eg 'CloudDrove' or 'AnmolNagpal'"
 }
 
 variable "enable" {
