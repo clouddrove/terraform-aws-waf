@@ -11,6 +11,7 @@ jobs:
       working_directory: './examples/complete/'
       provider: aws
       enable_plan: true
+      show_plan: false
     secrets:
       BUILD_ROLE: ${{ secrets.BUILD_ROLE }}
   byte_match_statement_rules:
@@ -20,6 +21,7 @@ jobs:
       working_directory: './examples/byte_match_statement_rules/'
       provider: aws
       enable_plan: true
+      show_plan: false
     secrets:
       BUILD_ROLE: ${{ secrets.BUILD_ROLE }}
   geo_allowlist_statement_rules:
@@ -29,6 +31,7 @@ jobs:
       working_directory: './examples/geo_allowlist_statement_rules/'
       provider: aws
       enable_plan: true
+      show_plan: false
     secrets:
       BUILD_ROLE: ${{ secrets.BUILD_ROLE }}
   geo_match_statement_rules:
@@ -38,6 +41,7 @@ jobs:
       working_directory: './examples/geo_match_statement_rules/'
       provider: aws
       enable_plan: true
+      show_plan: false
     secrets:
       BUILD_ROLE: ${{ secrets.BUILD_ROLE }}
   ip_set_reference_statement_rules:
@@ -47,6 +51,7 @@ jobs:
       working_directory: './examples/ip_set_reference_statement_rules/'
       provider: aws
       enable_plan: true
+      show_plan: false
     secrets:
       BUILD_ROLE: ${{ secrets.BUILD_ROLE }}
   managed_rule_group_statement_rules:
@@ -56,6 +61,7 @@ jobs:
       working_directory: './examples/managed_rule_group_statement_rules/'
       provider: aws
       enable_plan: true
+      show_plan: false
     secrets:
       BUILD_ROLE: ${{ secrets.BUILD_ROLE }}
   rate_based_statement_rules:
@@ -65,6 +71,7 @@ jobs:
       working_directory: './examples/rate_based_statement_rules/'
       provider: aws
       enable_plan: true
+      show_plan: false
     secrets:
       BUILD_ROLE: ${{ secrets.BUILD_ROLE }}
   regex_match_statement_rules:
@@ -74,6 +81,7 @@ jobs:
       working_directory: './examples/regex_match_statement_rules/'
       provider: aws
       enable_plan: true
+      show_plan: false
     secrets:
       BUILD_ROLE: ${{ secrets.BUILD_ROLE }}
   size_constraint_statement_rules:
@@ -83,6 +91,7 @@ jobs:
       working_directory: './examples/size_constraint_statement_rules/'
       provider: aws
       enable_plan: true
+      show_plan: false
     secrets:
       BUILD_ROLE: ${{ secrets.BUILD_ROLE }}
   sqli_match_statement_rules:
@@ -92,6 +101,7 @@ jobs:
       working_directory: './examples/sqli_match_statement_rules/'
       provider: aws
       enable_plan: true
+      show_plan: false
     secrets:
       BUILD_ROLE: ${{ secrets.BUILD_ROLE }}
   xss_match_statement:
@@ -101,5 +111,6 @@ jobs:
       working_directory: './examples/xss_match_statement/'
       provider: aws
       enable_plan: true
+      show_plan: false
     secrets:
       BUILD_ROLE: ${{ secrets.BUILD_ROLE }}
