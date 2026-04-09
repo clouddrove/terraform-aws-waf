@@ -11,6 +11,7 @@ module "labels" {
   managedby   = var.managedby
   label_order = var.label_order
   repository  = var.repository
+  extra_tags  = var.tags
 }
 
 #Module      : WAF
@@ -1247,6 +1248,7 @@ resource "aws_kms_key" "kms" {
   count                   = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
   deletion_window_in_days = var.kms_key_deletion_window
   enable_key_rotation     = var.enable_key_rotation
+  tags                    = module.labels.tags
 }
 
 resource "aws_kms_alias" "kms-alias" {
@@ -1392,6 +1394,7 @@ resource "aws_glue_catalog_database" "database" {
 
   name        = format("glue-%s", module.labels.id)
   description = "Glue Catalog Database for ${lower(module.labels.id)} WAF Logs"
+  tags        = module.labels.tags
 }
 
 # This table store column information that is needed by Amazon Kinesis Firehose as data format conversion configuration, for transforming from JSON to Parquet.
