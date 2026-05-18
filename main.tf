@@ -23,6 +23,7 @@ resource "aws_wafv2_ip_set" "main" {
   ip_address_version = "IPV4"
   addresses          = var.ip_addresses
   tags               = module.labels.tags
+  region             = var.region
 }
 
 #Module      : WAF
@@ -1247,6 +1248,7 @@ resource "aws_kms_key" "kms" {
   count                   = var.enable && var.waf_enabled && var.create_logging_configuration ? 1 : 0
   deletion_window_in_days = var.kms_key_deletion_window
   enable_key_rotation     = var.enable_key_rotation
+  multi_region            = var.multi_region
 }
 
 resource "aws_kms_alias" "kms-alias" {
@@ -1357,6 +1359,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "webacl_traffic_in
       sse_algorithm = "AES256"
     }
   }
+  bucket_key_enabled = var.bucket_key_enabled
 }
 
 resource "aws_s3_bucket_policy" "block-http" {
@@ -1496,7 +1499,8 @@ resource "aws_cloudwatch_log_group" "firehose_error_logs" {
   retention_in_days = "30"
   kms_key_id        = aws_kms_key.kms[0].arn
 
-  tags = module.labels.tags
+  tags                        = module.labels.tags
+  deletion_protection_enabled = var.deletion_protection_enabled
 }
 
 # This log stream is the one which hold the information inside the log group above.
@@ -1755,10 +1759,11 @@ resource "aws_wafv2_web_acl_logging_configuration" "main" {
 resource "aws_cloudwatch_log_group" "cloudwatch_logs" {
   count = var.enable && var.waf_enabled && var.enable_cloudwatch_logs ? 1 : 0
 
-  name              = "aws-waf-logs-${module.labels.id}"
-  retention_in_days = var.cloudwatch_logs_retention_in_days
-  kms_key_id        = var.kms_key_arn
-  tags              = module.labels.tags
+  name                        = "aws-waf-logs-${module.labels.id}"
+  retention_in_days           = var.cloudwatch_logs_retention_in_days
+  kms_key_id                  = var.kms_key_arn
+  tags                        = module.labels.tags
+  deletion_protection_enabled = var.deletion_protection_enabled
 }
 
 resource "aws_wafv2_web_acl_logging_configuration" "cloudwatch_logs" {

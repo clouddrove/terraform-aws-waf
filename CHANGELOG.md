@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - 2026-05-18
+### :sparkles: New Features
+- Updated module for AWS provider v5+ compatibility
+- Added new optional variables with safe defaults (backward-compatible)
+- Updated docs/terraform-docs.md and examples/basic/example.tf, examples/byte_match_statement_rules/example.tf, examples/complete/example.tf
+
 ## [2.1.0] - 2026-01-09
 ### :sparkles: New Features
 - [`749d008`](https://github.com/clouddrove/terraform-aws-waf/commit/749d0082f44467fd87eb1ea7afd852587b142554) - Add automerge github shared workflow *(PR [#74](https://github.com/clouddrove/terraform-aws-waf/pull/74) by [@pendharevaibhav-cd](https://github.com/pendharevaibhav-cd))*
