@@ -14,10 +14,9 @@ variable "environment" {
 
 variable "repository" {
   type        = string
-  default     = "https://github.com/clouddrove/terraform-aws-waf"
+  default     = ""
   description = "Terraform current module repo"
 }
-
 
 variable "label_order" {
   type        = list(any)
@@ -27,8 +26,14 @@ variable "label_order" {
 
 variable "managedby" {
   type        = string
-  default     = "CloudDrove"
+  default     = ""
   description = "ManagedBy, eg 'CloudDrove' or 'AnmolNagpal'"
+}
+
+variable "tags" {
+  type        = map(any)
+  default     = {}
+  description = "Additional tags (e.g. map(`BusinessUnit`,`XYZ`)."
 }
 
 variable "enable" {
