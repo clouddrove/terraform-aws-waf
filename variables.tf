@@ -205,3 +205,27 @@ variable "cloudwatch_logs_policy_document" {
   default     = ""
   description = "(Optional) Custome IAM Policy for CloudWatch Logs log group"
 }
+
+variable "deletion_protection_enabled" {
+  type        = bool
+  default     = false
+  description = "Whether to enable deletion protection for CloudWatch Log Groups"
+}
+
+variable "region" {
+  type        = string
+  default     = ""
+  description = "AWS region to use for regional resources"
+}
+
+variable "multi_region" {
+  type        = bool
+  default     = false
+  description = "Whether to create a multi-region KMS key"
+}
+
+variable "bucket_key_enabled" {
+  type        = bool
+  default     = false
+  description = "Whether to enable S3 bucket key for SSE-KMS encryption"
+}

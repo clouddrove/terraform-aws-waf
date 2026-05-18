@@ -397,4 +397,7 @@ module "waf" {
       }
     ]
   }
+  # deletion_protection_enabled = false  # Enable deletion protection for CloudWatch Log Groups
+  # multi_region = false  # Create multi-region KMS key
+  # bucket_key_enabled = false  # Enable S3 bucket key for SSE-KMS
 }
