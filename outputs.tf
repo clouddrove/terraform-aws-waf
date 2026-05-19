@@ -19,3 +19,8 @@ output "ip_set_arn" {
   value       = join("", aws_wafv2_ip_set.main[*].arn)
   description = "The ARN of Ip_set"
 }
+
+output "web_acl_arn" {
+  value       = join("", aws_wafv2_web_acl.main[*].arn)
+  description = "The ARN of the WAFv2 Web ACL. Use this to associate the ACL with an ALB, CloudFront, or API Gateway."
+}
