@@ -1356,11 +1356,11 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "webacl_traffic_in
 
   bucket = join("", aws_s3_bucket.webacl_traffic_information[*].id)
   rule {
+    bucket_key_enabled = var.bucket_key_enabled
     apply_server_side_encryption_by_default {
       sse_algorithm = "AES256"
     }
   }
-  bucket_key_enabled = var.bucket_key_enabled
 }
 
 resource "aws_s3_bucket_policy" "block-http" {
