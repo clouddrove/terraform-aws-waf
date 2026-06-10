@@ -76,35 +76,33 @@ module "waf" {
     {
       name     = "GeoAllowlistRule90"
       priority = "90"
-      action   = "count"
+      action   = "allow"
 
-      not_statement = {
-        geo_match_statement = {
-          country_codes = ["US"]
-        }
+      geo_match_statement = {
+        country_codes = ["US"]
       }
 
       visibility_config = {
-        cloudwatch_metrics_enabled = false
+        cloudwatch_metrics_enabled = true
         metric_name                = "GeoAllowlistRule90"
-        sampled_requests_enabled   = false
+        sampled_requests_enabled   = true
       }
     },
 
-    # ## geo_match_statement_rules 60
+    # ## geo_blocking_statement_rules 60
     {
-      name     = "GeoMatchRule60"
+      name     = "GeoBlockingRule60"
       priority = "60"
-      action   = "count"
+      action   = "block"
 
       geo_match_statement = {
         country_codes = ["NL", "GB"]
       }
 
       visibility_config = {
-        cloudwatch_metrics_enabled = false
-        metric_name                = "GeoMatchRule60"
-        sampled_requests_enabled   = false
+        cloudwatch_metrics_enabled = true
+        metric_name                = "GeoBlockingRule60"
+        sampled_requests_enabled   = true
       }
     },
 

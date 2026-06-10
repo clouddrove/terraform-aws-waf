@@ -1,3 +1,4 @@
+---
 name: tfsec
 permissions: write-all
 on:
@@ -5,6 +6,7 @@ on:
     paths:
       - '**/*.tf'
       - '*.tf'
+  workflow_dispatch:
 jobs:
   tfsec:
     if: github.actor != 'dependabot[bot]'
@@ -12,3 +14,4 @@ jobs:
     secrets: inherit
     with:
       working_directory: '.'
+...
