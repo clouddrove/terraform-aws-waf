@@ -4,7 +4,6 @@ name: 🔍 PR Checks
 on:
   pull_request:
     types: [opened, edited, synchronize, reopened]
-
 jobs:
   pr-validation:
     if: github.actor != 'dependabot[bot]'

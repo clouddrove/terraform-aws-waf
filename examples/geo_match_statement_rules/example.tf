@@ -6,12 +6,12 @@ module "waf" {
   source               = "../../"
   name                 = "waf"
   environment          = "test"
-  allow_default_action = false
+  allow_default_action = true
   waf_enabled          = true
   waf_scop             = "REGIONAL"
 
-  web_acl_association = false
-  resource_arn_list   = ["arn:aws:elasticloadbalancing:eu-west-1:xxxxxxx:loadbalancer/app/alb-test/xxxxxxxxx"]
+  web_acl_association = true
+  resource_arn_list   = ["arn:aws:elasticloadbalancing:eu-west-1:123456789012:loadbalancer/app/example-alb/1234567890abcdef"]
 
   visibility_config = {
     cloudwatch_metrics_enabled = true
@@ -20,33 +20,20 @@ module "waf" {
 
   rules = [
     {
-      name     = "rule-80"
+      name     = "block-geo-nl-gb"
       priority = "80"
-      action   = "count"
+      action   = "block"
 
       geo_match_statement = {
         country_codes = ["NL", "GB"]
       }
       visibility_config = {
-        cloudwatch_metrics_enabled = false
-        metric_name                = "rule-60"
-        sampled_requests_enabled   = false
+        cloudwatch_metrics_enabled = true
+        metric_name                = "block-geo-nl-gb"
+        sampled_requests_enabled   = true
       }
-    },
-    {
-      name     = "rule-81"
-      priority = "81"
-      action   = "allow"
-
-      geo_match_statement = {
-        country_codes = ["US"]
-      }
-      visibility_config = {
-        cloudwatch_metrics_enabled = false
-        metric_name                = "rule-60"
-        sampled_requests_enabled   = false
-      }
-  }, ]
+    }
+  ]
 
 
   #logs
